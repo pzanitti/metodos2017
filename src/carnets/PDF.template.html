@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <style>
+            .header {
+                text-align: center;
+                border: 1px solid black;
+                line-height: 1em;
+                background-color: lightblue;
+            }
+            
+            h1 {
+                font-size: 1em;
+            }
+            
+            h2 {
+                font-size: 0.8em;
+            }
+            
+            td {
+                vertical-align: top;
+            }
+            
+            body {
+                width: 700px;
+            }
+            
+            img {
+                padding-left: 3em;
+                width: 120px;
+                height: 120px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1><b>Licencia de Conducir</b></h1>
+            <h2><b>Municipalidad de Prueba</b></h2>
+        </div>
+        <br />
+        <table>
+            <tr>
+                <td>
+                    <img src="http://clipart-library.com/images/kTMKzGyMc.jpg"/> <br/><br/>
+                    Clase: {{ clase }}<br/>
+                    {{ clase.descripcion }} <br/><br/>
+                    Otorgamiento: {{ emision }}<br/>
+                    Vencimiento: {{ expiracion }}
+                </td>
+                <td>
+                    Nro de Licencia: {{ numero }}<br/>
+                    Apellidos: {{ apellidos }}<br/>
+                    Nombres: {{ nombres }}<br/>
+                    Domicilio: {{ domicilio }}<br/><br/>
+                    Grupo y factor: {{ grupoSanguineo }}{{ factorSanguineo }}<br/>
+                    Donante: {{ donante }}<br/><br/>
+                    Observaciones: {{ observaciones }}
+                </td> 
+            </tr>
+        </table>
+        <hr/>
+    </body>
+</html>
