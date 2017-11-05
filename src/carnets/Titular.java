@@ -1,22 +1,35 @@
 package carnets;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Titular {
-    private final TipoDNI tipoDNI;
-    private final Integer nroDNI;
+    private final TipoDocumento tipoDocumento;
+    private final String numeroDocumento;
     private final String apellidos;
     private final String nombres;
     private final LocalDate fechaNacimiento;
     private final String direccion;
     private final GrupoSanguineo grupoSanguineo;
     private final FactorSanguineo factorSanguineo;
-    private final Boolean esDonante;
+    private final boolean esDonante;
     private final String observaciones;
 
-    public Titular(TipoDNI tipoDNI, Integer nroDNI, String apellidos, String nombres, LocalDate fechaNacimiento, String direccion, GrupoSanguineo grupoSanguineo, FactorSanguineo factorSanguineo, Boolean esDonante, String observaciones) {
-        this.tipoDNI = tipoDNI;
-        this.nroDNI = nroDNI;
+    public Titular(TipoDocumento tipoDocumento, String numeroDocumento, String apellidos, String nombres, LocalDate fechaNacimiento, String direccion, GrupoSanguineo grupoSanguineo, FactorSanguineo factorSanguineo, Boolean esDonante, String observaciones) {
+        Objects.requireNonNull(tipoDocumento);
+        Objects.requireNonNull(apellidos);
+        if(apellidos.isEmpty()) throw new IllegalArgumentException();
+        Objects.requireNonNull(nombres);
+        if(nombres.isEmpty()) throw new IllegalArgumentException();
+        Objects.requireNonNull(fechaNacimiento);
+        if(fechaNacimiento.compareTo(LocalDate.now()) > 0) throw new IllegalArgumentException("fechaNacimiento no puede ser posterior a la fecha actual");
+        Objects.requireNonNull(direccion);
+        Objects.requireNonNull(grupoSanguineo);
+        Objects.requireNonNull(factorSanguineo);
+        Objects.requireNonNull(observaciones);
+
+        this.tipoDocumento = tipoDocumento;
+        this.numeroDocumento = numeroDocumento;
         this.apellidos = apellidos;
         this.nombres = nombres;
         this.fechaNacimiento = fechaNacimiento;
@@ -27,12 +40,12 @@ public class Titular {
         this.observaciones = observaciones;
     }
     
-    public TipoDNI getTipoDNI () {
-        return this.tipoDNI;
+    public TipoDocumento getTipoDocumento () {
+        return this.tipoDocumento;
     }
     
-    public Integer getNroDNI () {
-        return this.nroDNI;
+    public String getNumeroDocumento () {
+        return this.numeroDocumento;
     }
     
     public String getApellidos () {
@@ -55,6 +68,10 @@ public class Titular {
         return this.fechaNacimiento.getMonthValue();
     }
     
+    public int getEdad() {
+        return fechaNacimiento.until(LocalDate.now()).getYears();
+    }
+    
     public String getDireccion () {
         return this.direccion;
     }
@@ -67,11 +84,40 @@ public class Titular {
         return factorSanguineo;
     }
 
-    public Boolean getEsDonante() {
+    public boolean getEsDonante() {
         return esDonante;
     }
 
     public String getObservaciones() {
         return observaciones;
+    }
+    
+        @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 47 * hash + Objects.hashCode(this.tipoDocumento);
+        hash = 47 * hash + Objects.hashCode(this.numeroDocumento);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Titular other = (Titular) obj;
+        if (!Objects.equals(this.numeroDocumento, other.numeroDocumento)) {
+            return false;
+        }
+        if (this.tipoDocumento != other.tipoDocumento) {
+            return false;
+        }
+        return true;
     }
 }

@@ -1,47 +1,30 @@
 package carnets;
 
-import java.util.ArrayList;
-
-public class Clase {
-    private int id;
-    private String letra;
-    private String descripcion;
-    private Boolean esProfesional;
-
-    public Clase (int id, String letra, String descripcion, Boolean esProfesional) {
-        this.id = id;
+public enum Clase {
+    A('A', "Ciclomotores, motocicletas y triciclos motorizados.", false),
+    B('B', "Automóviles y camionetas con acoplado.", false),
+    C('C', "Camiones sin acoplado y los comprendidos en la clase B.", true),
+    D('D', "Servicio de transporte de pasajeros, emergencia, seguridad y los comprendidos en la clase B o C, según el caso.", true),
+    E('E', "Camiones articulados o con acoplado, maquinaria especial no agrícola y los comprendidos en la clase B y C.", true),
+    F('F', "Automotores especialmente adaptados para discapacitados.", false),
+    G('G', "Tractores agrícolas y maquinaria especial agrícola.", false);
+    
+    final public char letra;
+    final public String descripcion;
+    final public boolean isProfesional;
+    
+    private Clase (char letra, String descripcion, boolean isProfesional) {
         this.letra = letra;
         this.descripcion = descripcion;
-        this.esProfesional = esProfesional;
-    }
-
-    public int getId() {
-        return id;
+        this.isProfesional = isProfesional;
     }
     
-    public String getLetra () {
-        return this.letra;
+    public static Clase fromLetra(char letra) {
+    for (Clase clase : Clase.values()) {
+      if (clase.letra == letra) {
+        return clase;
+      }
     }
-    
-    public String getDescripcion () {
-        return this.descripcion;
-    }
-    
-    public Boolean getEsProfesional () {
-        return this.esProfesional;
-    }
-    
-    public static ArrayList<Clase> init () {
-        ArrayList<Clase> clases = new ArrayList<>();
-
-        clases.add(new Clase(0, "A", "Ciclomotores, motocicletas y triciclos motorizados.", false));
-        clases.add(new Clase(1, "B", "Automóviles y camionetas con acoplado.", false));
-        clases.add(new Clase(2, "C", "Camiones sin acoplado y los comprendidos en la clase B.", false));
-        clases.add(new Clase(3, "D", "Servicio de transporte de pasajeros, emergencia, seguridad y los comprendidos en la clase B o C, según el caso.", false));
-        clases.add(new Clase(4, "E", "Camiones articulados o con acoplado, maquinaria especial no agrícola y los comprendidos en la clase B y C.", false));
-        clases.add(new Clase(5, "F", "Automotores especialmente adaptados para discapacitados.", false));
-        clases.add(new Clase(6,"G", "Tractores agrícolas y maquinaria especial agrícola.", false));
-
-        return clases;
-    }
+    return null;
+  }
 }

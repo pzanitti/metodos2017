@@ -1,16 +1,16 @@
 package carnets;
 
 import java.time.LocalDate;
-import java.time.Year;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Carnet {
-    String numero;
-    Clase clase;
-    LocalDate emision;
-    LocalDate expiracion;
-    Titular titular;
+    private String numero;
+    final private Clase clase;
+    private LocalDate emision;
+    final private LocalDate expiracion;
+    final private Titular titular;
 
     public void setNumero (int numero) {
         this.numero = String.format("%9s", numero).replace(' ', '0');
@@ -23,6 +23,10 @@ public class Carnet {
     public Clase getClase() {
         return clase;
     }
+    
+    public void setEmision (LocalDate emision) {
+        this.emision = emision;
+    }
 
     public LocalDate getEmision() {
         return emision;
@@ -31,103 +35,81 @@ public class Carnet {
     public LocalDate getExpiracion() {
         return expiracion;
     }
+    
+    public int getAntiguedad() {
+        return emision.until(LocalDate.now()).getYears();
+    }
 
     public Titular getTitular() {
         return titular;
     }
 
-    public Carnet (ArrayList<Carnet> carnets, Clase clase, Integer vigencia, Titular titular)
-            throws EsMenorException, EsMenorParaCDEException, CareceBParaCDEException, EsMayorParaCDEException  {
-        LocalDate emision = LocalDate.now();
-        LocalDate proximoCumpleanios;
+    public Carnet(Optional<Carnet> carnetAnterior, Clase clase, int vigencia, Titular titular)
+            throws EmisionException  {
         
-        boolean agregarAnioExtra;
+        Objects.requireNonNull(carnetAnterior);
+        Objects.requireNonNull(clase);
+        Objects.requireNonNull(clase);
+        Objects.requireNonNull(titular);
+        if(carnetAnterior.isPresent() && !carnetAnterior.get().getTitular().equals(titular)) throw new CarnetAnteriorInvalidoException();
         
-        if (titular.getMesNacimiento() < emision.getMonthValue()) {
-            // El cumpleaños ya paso, es el anio que viene
-            proximoCumpleanios = titular.getFechaNacimiento().withYear(emision.getYear() + 1);
-            agregarAnioExtra = true;
-        } else if (titular.getMesNacimiento() == emision.getMonthValue()) {
-            // Es el mismo mes, tengo que ver el dia
-            if (titular.getDiaNacimiento() < emision.getDayOfMonth()) {
-                // El cumpleaños ya paso, es el anio que viene
-                proximoCumpleanios = titular.getFechaNacimiento().withYear(emision.getYear() + 1);
-            } else {
-                // Todavia no fue, el cumpleanios es hoy o va a ser en este mes
-                proximoCumpleanios = titular.getFechaNacimiento().withYear(emision.getYear());
-            }
-        } else {
-            // Todavia no fue, el cumpleanios va a ser en este anio
-            proximoCumpleanios = titular.getFechaNacimiento().withYear(emision.getYear());
-        }
-
-        this.expiracion = proximoCumpleanios.plusYears(vigencia);
-        this.emision = emision;
+        this.emision = LocalDate.now();
         this.clase = clase;
         this.titular = titular;
+        
+        int edad = titular.getEdad();
 
-        int edad = titular.getFechaNacimiento().until(LocalDate.now()).getYears();
-
-        // No permitir menores de 17
-        if (edad < 17) {
-            throw new EsMenorException();
+        if(!clase.isProfesional) {
+            if (edad < 17) throw new EsMenorException();
+        } else {
+            if(edad < 21) throw new EsMenorParaProfesionalException();
+            
+            if(!carnetAnterior.isPresent()) throw new CarnetAnteriorRequeridoException();
+            
+            boolean primeraVezProfesional;
+            if(carnetAnterior.get().getClase().isProfesional == true) primeraVezProfesional = false;
+            else if(carnetAnterior.get().getClase() == Clase.B && carnetAnterior.get().getAntiguedad() >= 1) primeraVezProfesional = true;
+            else throw new CarnetAnteriorInvalidoException();
+            
+            if(primeraVezProfesional && edad > 65) throw new EsMayorParaPrimerProfesionalException();
         }
-
-        // Si el carnet es profesional, ver si tuvo B por un anio
-        if (clase.getEsProfesional()) {
-            if (edad < 21) {
-                throw new EsMenorParaCDEException();
-            }
-
-            // Comprobar si tuvo B por un anio
-            Boolean tuvoBPorUnAnio = false;
-
-            for (Carnet unCarnet: carnets) {
-                // Ver si este carnet es de esta persona
-                if (unCarnet.titular.getTipoDNI() == titular.getTipoDNI()
-                    && Objects.equals(unCarnet.titular.getNroDNI(), titular.getNroDNI())) {
-                    // Ver si es B
-                    if (unCarnet.clase.getLetra().equals("B")) {
-                        // Ver si tuvo un anio
-                        if (unCarnet.getEmision().isBefore(LocalDate.now().minusYears(1))) {
-                            tuvoBPorUnAnio = true;
-                        }
-                    }
-                }
-            }
-
-            if (tuvoBPorUnAnio) {
-               // Tuvo CDE
-               Boolean TuvoCDE = false;
-               
-               for (Carnet unCarnet: carnets) {
-                   switch (unCarnet.getClase().getLetra()) {
-                       case "C":
-                       case "D":
-                       case "E":
-                           TuvoCDE = true;
-                   }
-               }
-               
-               if (TuvoCDE) {
-               } else {
-                   throw new EsMayorParaCDEException();
-               }
-            } else {
-                throw new CareceBParaCDEException();
-            }
+        
+        this.expiracion = calcularExpiracion(emision, titular.getFechaNacimiento(), vigencia);
+    }
+    
+    static private LocalDate calcularExpiracion(LocalDate emision, LocalDate nacimiento, int vigencia)
+    {
+        LocalDate cumpleaniosEsteAnio = nacimiento.withYear(emision.getYear());
+        
+        if (emision.isAfter(cumpleaniosEsteAnio)) {
+            return cumpleaniosEsteAnio.plusYears(1 + vigencia);
+        } else {
+            return cumpleaniosEsteAnio.plusYears(vigencia);
         }
     }
-}
+    
+    static public Optional<Carnet> getCarnetAnteriorMasUtil(Carnet... carnets)
+   {
+       Optional<Carnet> profesional = Arrays.stream(carnets).filter(c -> c.getClase().isProfesional).findAny();
+       
+       if(profesional.isPresent()) return profesional;
+       
+       Optional<Carnet> bAntiguedadUnAno = Arrays.stream(carnets).filter(c -> c.getClase() == Clase.B && c.getAntiguedad() >= 1).findAny();
+       
+       if(bAntiguedadUnAno.isPresent()) return bAntiguedadUnAno;
+       
+       return Arrays.stream(carnets).findAny();
+   }
+    
+    static public class EmisionException extends Exception {};
+    
+    static public class EsMenorException extends EmisionException {}
 
-class EsMenorException extends Exception {
-}
+    static public class EsMenorParaProfesionalException extends EmisionException {}
 
-class EsMenorParaCDEException extends Exception {
-}
+    static public class EsMayorParaPrimerProfesionalException extends EmisionException {}
 
-class CareceBParaCDEException extends Exception {
-}
+    static public class CarnetAnteriorRequeridoException extends EmisionException {}
 
-class EsMayorParaCDEException extends Exception {
+    static public class CarnetAnteriorInvalidoException extends EmisionException {}
 }

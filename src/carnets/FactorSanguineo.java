@@ -1,24 +1,12 @@
 package carnets;
 
-import java.util.ArrayList;
-
-public class FactorSanguineo {
-    private String factorSanguineo;
+public enum FactorSanguineo {
+    POSITIVO('+'),
+    NEGATIVO('-');
     
-    public FactorSanguineo (String factorSanguineo) {
-        this.factorSanguineo = factorSanguineo;
-    }
+    final public char signo;
     
-    public String getFactorSanguineo () {
-        return this.factorSanguineo;
-    }
-    
-    public static ArrayList<FactorSanguineo> init () {
-        ArrayList<FactorSanguineo> factorSanguineos = new ArrayList<>();
-        
-        factorSanguineos.add(new FactorSanguineo("-"));
-        factorSanguineos.add(new FactorSanguineo("+"));
-        
-        return factorSanguineos;
+    private FactorSanguineo(char signo) {
+        this.signo = signo;
     }
 }

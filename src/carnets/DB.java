@@ -31,9 +31,11 @@ public class DB {
 
             sql = "CREATE TABLE IF NOT EXISTS carnets (\n"
                 + " numero integer PRIMARY KEY AUTOINCREMENT,\n"
-                + " clase integer NOT NULL,\n"
+                + " clase char NOT NULL,\n"
                 + " emision TEXT NOT NULL,\n"
-                + " expiracion TEXT NOT NULL\n"
+                + " expiracion TEXT NOT NULL,\n"
+                + " tipoDocumento TEXT NOT NULL,\n"
+                + " numeroDocumento TEXT NOT NULL\n"
                 + ");";
             stmt.execute(sql);
             

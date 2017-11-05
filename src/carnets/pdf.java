@@ -33,8 +33,8 @@ public class pdf {
         document.open();
 
         String content = readFile(HTML, StandardCharsets.UTF_8);
-        content = content.replace("{{ clase }}", carnet.getClase().getLetra());
-        content = content.replace("{{ clase.descripcion }}", carnet.getClase().getDescripcion());
+        content = content.replace("{{ clase }}", Character.toString(carnet.getClase().letra));
+        content = content.replace("{{ clase.descripcion }}", carnet.getClase().descripcion);
         content = content.replace("{{ emision }}", carnet.getEmision().toString());
         content = content.replace("{{ expiracion }}", carnet.getExpiracion().toString());
 
@@ -42,8 +42,8 @@ public class pdf {
         content = content.replace("{{ nombres }}", titular.getNombres());
         content = content.replace("{{ apellidos }}", titular.getApellidos());
         content = content.replace("{{ domicilio }}", titular.getDireccion());
-        content = content.replace("{{ grupoSanguineo }}", titular.getGrupoSanguineo().getGrupoSanguineo());
-        content = content.replace("{{ factorSanguineo }}", titular.getFactorSanguineo().getFactorSanguineo());
+        content = content.replace("{{ grupoSanguineo }}", titular.getGrupoSanguineo().nombre);
+        content = content.replace("{{ factorSanguineo }}", Character.toString(titular.getFactorSanguineo().signo));
         content = content.replace("{{ donante }}", titular.getEsDonante()? "Si" : "No");
         content = content.replace("{{ observaciones }}", titular.getObservaciones());
         

@@ -9,18 +9,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author user
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
-    public ArrayList<Carnet> carnets;
-    public ArrayList<Clase> clases;
-    public ArrayList<Costo> costos;
-    public ArrayList<TipoDNI> tipoDNIs;
-    public ArrayList<GrupoSanguineo> grupoSanguineos;
-    public ArrayList<FactorSanguineo> factorSanguineos;
+    public List<Carnet> carnets;
+    final public Clase[] clases = Clase.values();
+    public List<Costo> costos;
+    final public TipoDocumento[] tipoDocumentos = TipoDocumento.values();
+    final public GrupoSanguineo[] grupoSanguineos = GrupoSanguineo.values();
+    final public FactorSanguineo[] factorSanguineos = FactorSanguineo.values();
                 
     /**
      * Creates new form VentanaPrincipal
@@ -29,11 +30,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         initComponents();
         DB.init();
         carnets = new ArrayList<>();
-        clases = Clase.init();
-        costos = Costo.init(clases);
-        tipoDNIs = TipoDNI.init();
-        grupoSanguineos = GrupoSanguineo.init();
-        factorSanguineos = FactorSanguineo.init();
+        costos = Costo.init();
     }
 
     /**

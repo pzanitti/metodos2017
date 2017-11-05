@@ -5,14 +5,19 @@
  */
 package carnets;
 
+import carnets.Carnet.CarnetAnteriorInvalidoException;
+import carnets.Carnet.CarnetAnteriorRequeridoException;
+import carnets.Carnet.EsMayorParaPrimerProfesionalException;
+import carnets.Carnet.EsMenorException;
+import carnets.Carnet.EsMenorParaProfesionalException;
 import com.itextpdf.text.DocumentException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.Optional;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -31,7 +36,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
     private ComboBoxModel<String> claseModel;
     private Clase claseSeleccionada;
     private Boolean esDonanteSeleccionado;
-    private TipoDNI tipoDNISeleccionado;
+    private TipoDocumento tipoDocumentoSeleccionado;
     private FactorSanguineo factorSanguineoSeleccionado;
     private GrupoSanguineo grupoSanguineoSeleccionado;
     
@@ -43,29 +48,29 @@ public class VentanaEmitir extends javax.swing.JDialog {
         
         // Init tipoDNICombo
         ArrayList<String> tipoDNIModelItems = new ArrayList<>();
-        for (TipoDNI tipoDNI: ventanaPrincipal.tipoDNIs) {
-            tipoDNIModelItems.add(tipoDNI.getTipoDNI());
+        for (TipoDocumento tipoDocumento: ventanaPrincipal.tipoDocumentos) {
+            tipoDNIModelItems.add(tipoDocumento.nombre);
         }
         tipoDNIModel = new DefaultComboBoxModel(tipoDNIModelItems.toArray());
         
         // Init grupoSanguineoCombo
         ArrayList<String> grupoSanguineoModelItems = new ArrayList<>();
         for (GrupoSanguineo grupoSanguineo: ventanaPrincipal.grupoSanguineos) {
-            grupoSanguineoModelItems.add(grupoSanguineo.getGrupoSanguineo());
+            grupoSanguineoModelItems.add(grupoSanguineo.nombre);
         }
         grupoSanguineoModel = new DefaultComboBoxModel(grupoSanguineoModelItems.toArray());
         
         // Init factorSanguineoCombo
-        ArrayList<String> factorSanguineoModelItems = new ArrayList<>();
+        ArrayList<Character> factorSanguineoModelItems = new ArrayList<>();
         for (FactorSanguineo factorSanguineo: ventanaPrincipal.factorSanguineos) {
-            factorSanguineoModelItems.add(factorSanguineo.getFactorSanguineo());
+            factorSanguineoModelItems.add(factorSanguineo.signo);
         }
         factorSanguineoModel = new DefaultComboBoxModel(factorSanguineoModelItems.toArray());
         
         // Init factorSanguineoCombo
-        ArrayList<String> claseModelItems = new ArrayList<>();
+        ArrayList<Character> claseModelItems = new ArrayList<>();
         for (Clase clase: ventanaPrincipal.clases) {
-            claseModelItems.add(clase.getLetra());
+            claseModelItems.add(clase.letra);
         }
         claseModel = new DefaultComboBoxModel(claseModelItems.toArray());
         
@@ -377,8 +382,8 @@ public class VentanaEmitir extends javax.swing.JDialog {
             }
             
             Titular unTitular = new Titular(
-            tipoDNISeleccionado, 
-            Integer.parseInt(nroDNITextField.getText()),
+            tipoDocumentoSeleccionado, 
+            nroDNITextField.getText(),
             apellidosTextField.getText(),
             nombresTextField.getText(),
             fechaNacimiento,
@@ -388,8 +393,12 @@ public class VentanaEmitir extends javax.swing.JDialog {
             esDonanteSeleccionado,
             observacionesTextField.getText());
             
+            List<Carnet> carnetsTitular = DAOCarnet.buscar(unTitular);
+            
+            Optional<Carnet> carnetMasUtil = Carnet.getCarnetAnteriorMasUtil(carnetsTitular.toArray(new Carnet[carnetsTitular.size()]));
+            
             Carnet unCarnet = new Carnet(
-                    ventanaPrincipal.carnets,
+                    carnetMasUtil,
                     claseSeleccionada,
                     Integer.parseInt(vigenciaTextField.getText()),
                     unTitular);
@@ -401,22 +410,20 @@ public class VentanaEmitir extends javax.swing.JDialog {
         }
         catch (DateTimeParseException exc) {
             JOptionPane.showMessageDialog(null, "La fecha de nacimiento debe ser válida y estar en formato dd/mm/yyyy.");
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "El DNI debe contener solo numeros.");
         } catch (CampoVacioException e) {
             JOptionPane.showMessageDialog(null, e.getMessage() + " no puede estar vacío.");
         } catch (EsMenorException e) {
             JOptionPane.showMessageDialog(null, "No se puede emitir a un menor.");
-        } catch (EsMenorParaCDEException e) {
+        } catch (EsMenorParaProfesionalException e) {
             JOptionPane.showMessageDialog(null, "No cumple con edad mínima para el tipo profesional.");
-        } catch (EsMayorParaCDEException e) {
+        } catch (EsMayorParaPrimerProfesionalException e) {
             JOptionPane.showMessageDialog(null, "Supera la edad máxima para primer carnet profesional.");
-        } catch (CareceBParaCDEException e) {
+        } catch (CarnetAnteriorRequeridoException | CarnetAnteriorInvalidoException e) {
             JOptionPane.showMessageDialog(null, "No cumple los requisitos de carnet B para carnet profesional.");
-        } catch (IOException ex) {
-            Logger.getLogger(VentanaEmitir.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (DocumentException ex) {
-            Logger.getLogger(VentanaEmitir.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | DocumentException ex) {
+            JOptionPane.showMessageDialog(null, "Error de escritura al generar el PDF.");
+        } catch (Carnet.EmisionException e) {
+            JOptionPane.showMessageDialog(null, "Error general de emisión.");
         }
     }//GEN-LAST:event_emitirBtnActionPerformed
 
@@ -428,7 +435,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
             || "3".equals(vigenciaTextField.getText())
             || "4".equals(vigenciaTextField.getText())
             || "5".equals(vigenciaTextField.getText())) {
-            costoLabel.setText(Costo.calcularCosto(ventanaPrincipal.costos, claseSeleccionada, new Integer(vigenciaTextField.getText())).toString());
+            costoLabel.setText(String.valueOf(Costo.calcularCosto(ventanaPrincipal.costos, claseSeleccionada, new Integer(vigenciaTextField.getText()))));
         } else {
            vigenciaTextField.setText("");
            costoLabel.setText("-");
@@ -437,17 +444,17 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
     private void claseComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_claseComboActionPerformed
         JComboBox cb = (JComboBox)evt.getSource();
-        String letraClase = (String)cb.getSelectedItem();
+        char letraClase = (char)cb.getSelectedItem();
 
         for (Clase unaClase: ventanaPrincipal.clases) {
-            if (unaClase.getLetra().equals(letraClase)) {
+            if (unaClase.letra == letraClase) {
                 claseSeleccionada = unaClase;
                 break;
             }
         }
 
         if (!vigenciaTextField.getText().equals("")) {
-            costoLabel.setText(Costo.calcularCosto(ventanaPrincipal.costos, claseSeleccionada, new Integer(vigenciaTextField.getText())).toString());
+            costoLabel.setText(String.valueOf(Costo.calcularCosto(ventanaPrincipal.costos, claseSeleccionada, new Integer(vigenciaTextField.getText()))));
         }
     }//GEN-LAST:event_claseComboActionPerformed
 
@@ -455,9 +462,9 @@ public class VentanaEmitir extends javax.swing.JDialog {
         JComboBox cb = (JComboBox)evt.getSource();
         String nombreTipoDNI = (String)cb.getSelectedItem();
         
-        for (TipoDNI unTipoDNI: ventanaPrincipal.tipoDNIs) {
-            if (unTipoDNI.getTipoDNI().equals(nombreTipoDNI)) {
-                tipoDNISeleccionado = unTipoDNI;
+        for (TipoDocumento unTipoDocumento: ventanaPrincipal.tipoDocumentos) {
+            if (unTipoDocumento.nombre.equals(nombreTipoDNI)) {
+                tipoDocumentoSeleccionado = unTipoDocumento;
                 break;
             }
         }
@@ -468,7 +475,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
         String nombreGrupoSanguineo = (String)cb.getSelectedItem();
         
         for (GrupoSanguineo unGrupoSanguineo: ventanaPrincipal.grupoSanguineos) {
-            if (unGrupoSanguineo.getGrupoSanguineo().equals(nombreGrupoSanguineo)) {
+            if (unGrupoSanguineo.nombre.equals(nombreGrupoSanguineo)) {
                 grupoSanguineoSeleccionado = unGrupoSanguineo;
                 break;
             }
@@ -477,10 +484,10 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
     private void factorSanguineoComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_factorSanguineoComboActionPerformed
         JComboBox cb = (JComboBox)evt.getSource();
-        String nombreFactorSanguineo = (String)cb.getSelectedItem();
+        char nombreFactorSanguineo = (char)cb.getSelectedItem();
         
         for (FactorSanguineo unFactorSanguineo: ventanaPrincipal.factorSanguineos) {
-            if (unFactorSanguineo.getFactorSanguineo().equals(nombreFactorSanguineo)) {
+            if (unFactorSanguineo.signo == nombreFactorSanguineo) {
                 factorSanguineoSeleccionado = unFactorSanguineo;
                 break;
             }
