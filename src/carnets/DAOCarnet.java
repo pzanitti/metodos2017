@@ -63,7 +63,6 @@ public class DAOCarnet {
                     carnet = new Carnet(
                             Optional.empty(),
                             Clase.fromLetra(rs.getString("Clase").charAt(0)),
-                            0,
                             unTitular
                     );
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -72,12 +71,6 @@ public class DAOCarnet {
                     carnets.add(carnet);
                 } catch (Exception e) {
                 }
-//                System.out.println(rs.getInt("numero") +  "\t" + 
-//                                   rs.getString("clase") + "\t" +
-//                                   rs.getString("emision") + "\t" +
-//                                   rs.getString("expiracion") + "\t" +
-//                                   rs.getString("tipoDocumento") + "\t" +
-//                                   rs.getDouble("numeroDocumento"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());

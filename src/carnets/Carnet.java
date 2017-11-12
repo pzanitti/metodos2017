@@ -44,7 +44,7 @@ public class Carnet {
         return titular;
     }
 
-    public Carnet(Optional<Carnet> carnetAnterior, Clase clase, int vigencia, Titular titular)
+    public Carnet(Optional<Carnet> carnetAnterior, Clase clase, Titular titular)
             throws EmisionException  {
         
         Objects.requireNonNull(carnetAnterior);
@@ -58,10 +58,18 @@ public class Carnet {
         this.titular = titular;
         
         int edad = titular.getEdad();
-
+        
+        Vigencia vigenciaMax;
+        
         if(!clase.isProfesional) {
             if (edad < 17) throw new EsMenorException();
-        } else {
+            
+            boolean tuvoCarnetMismaClase = carnetAnterior.map(ca -> ca.getClase() == clase && ca.getAntiguedad() >= 1).orElse(false);
+            
+            vigenciaMax = vigenciaMaximaNoProfesional(edad, tuvoCarnetMismaClase);
+            
+        }
+        else { //if clase.isProfesional
             if(edad < 21) throw new EsMenorParaProfesionalException();
             
             if(!carnetAnterior.isPresent()) throw new CarnetAnteriorRequeridoException();
@@ -72,20 +80,46 @@ public class Carnet {
             else throw new CarnetAnteriorInvalidoException();
             
             if(primeraVezProfesional && edad > 65) throw new EsMayorParaPrimerProfesionalException();
+            
+            vigenciaMax = vigenciaMaximaProfesional(edad);
         }
-        
-        this.expiracion = calcularExpiracion(emision, titular.getFechaNacimiento(), vigencia);
+
+        this.expiracion = calcularExpiracion(emision, titular.getFechaNacimiento(), vigenciaMax);
     }
     
-    static private LocalDate calcularExpiracion(LocalDate emision, LocalDate nacimiento, int vigencia)
+    static private LocalDate calcularExpiracion(LocalDate emision, LocalDate nacimiento, Vigencia vigencia)
     {
         LocalDate cumpleaniosEsteAnio = nacimiento.withYear(emision.getYear());
         
         if (emision.isAfter(cumpleaniosEsteAnio)) {
-            return cumpleaniosEsteAnio.plusYears(1 + vigencia);
+            return cumpleaniosEsteAnio.plusYears(1 + vigencia.anos);
         } else {
-            return cumpleaniosEsteAnio.plusYears(vigencia);
+            return cumpleaniosEsteAnio.plusYears(vigencia.anos);
         }
+    }
+
+    static public Vigencia vigenciaMaximaNoProfesional(int edad, boolean tuvoCarnet)
+        throws EsMenorException
+    {
+        if(edad < 17) throw new EsMenorException();
+        if(edad < 21) {
+            if(tuvoCarnet) return Vigencia.TRES_ANOS;
+            else return Vigencia.UN_ANO;
+        }
+        if(edad <= 46) return Vigencia.CINCO_ANOS;
+        if(edad <= 60) return Vigencia.CUATRO_ANOS;
+        if(edad <= 70) return Vigencia.TRES_ANOS;
+        else return Vigencia.UN_ANO;
+    }
+    
+    static public Vigencia vigenciaMaximaProfesional(int edad)
+        throws EsMenorParaProfesionalException
+    {
+        if(edad < 21) throw new EsMenorParaProfesionalException();
+        if(edad <= 46) return Vigencia.CINCO_ANOS;
+        if(edad <= 60) return Vigencia.CUATRO_ANOS;
+        if(edad <= 70) return Vigencia.TRES_ANOS;
+        else return Vigencia.UN_ANO;
     }
     
     static public Optional<Carnet> getCarnetAnteriorMasUtil(Carnet... carnets)
