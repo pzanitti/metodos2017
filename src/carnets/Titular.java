@@ -84,7 +84,7 @@ public class Titular {
         return factorSanguineo;
     }
 
-    public boolean getEsDonante() {
+    public boolean isDonante() {
         return esDonante;
     }
 

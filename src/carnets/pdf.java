@@ -38,13 +38,13 @@ public class pdf {
         content = content.replace("{{ emision }}", carnet.getEmision().toString());
         content = content.replace("{{ expiracion }}", carnet.getExpiracion().toString());
 
-        content = content.replace("{{ numero }}", carnet.getNumero());
+        content = content.replace("{{ numero }}", String.valueOf(carnet.getNumero()));
         content = content.replace("{{ nombres }}", titular.getNombres());
         content = content.replace("{{ apellidos }}", titular.getApellidos());
         content = content.replace("{{ domicilio }}", titular.getDireccion());
         content = content.replace("{{ grupoSanguineo }}", titular.getGrupoSanguineo().nombre);
         content = content.replace("{{ factorSanguineo }}", Character.toString(titular.getFactorSanguineo().signo));
-        content = content.replace("{{ donante }}", titular.getEsDonante()? "Si" : "No");
+        content = content.replace("{{ donante }}", titular.isDonante()? "Sí" : "No");
         content = content.replace("{{ observaciones }}", titular.getObservaciones());
         
         PdfPTable table = new PdfPTable(1);

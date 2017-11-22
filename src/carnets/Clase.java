@@ -1,5 +1,7 @@
 package carnets;
 
+import java.util.Arrays;
+
 public enum Clase {
     A('A', "Ciclomotores, motocicletas y triciclos motorizados.", false),
     B('B', "Automóviles y camionetas con acoplado.", false),
@@ -20,11 +22,9 @@ public enum Clase {
     }
     
     public static Clase fromLetra(char letra) {
-    for (Clase clase : Clase.values()) {
-      if (clase.letra == letra) {
-        return clase;
-      }
+        return Arrays.stream(Clase.values())
+            .filter(c -> c.letra == letra)
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("No such value for this enum"));
     }
-    return null;
-  }
 }

@@ -11,4 +11,8 @@ public enum GrupoSanguineo {
     private GrupoSanguineo(String nombre) {
         this.nombre = nombre;
     }
+    
+    public String getGrupoSanguineo() {
+        return this.nombre;
+    }
 }

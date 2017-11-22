@@ -5,9 +5,6 @@
  */
 package carnets;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,6 +128,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jMenu3.setText("Titulares");
 
         jMenuItem6.setText("Alta");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
         jMenu3.add(jMenuItem6);
 
         jMenuItem7.setText("Búsqueda");
@@ -176,6 +178,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem3ActionPerformed
+
+    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+        VentanaAltaTitular ventanaAlta = new VentanaAltaTitular(this, true);
+        ventanaAlta.setVisible(true);
+    }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     /**
      * @param args the command line arguments
