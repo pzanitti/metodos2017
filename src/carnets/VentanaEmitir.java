@@ -12,13 +12,15 @@ import carnets.Carnet.EsMenorException;
 import carnets.Carnet.EsMenorParaProfesionalException;
 import com.itextpdf.text.DocumentException;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
-import javax.swing.AbstractButton;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -31,14 +33,15 @@ import javax.swing.JOptionPane;
 public class VentanaEmitir extends javax.swing.JDialog {
     private final VentanaPrincipal ventanaPrincipal = (VentanaPrincipal) this.getParent();
     private final ComboBoxModel<String> tipoDNIModel;
-    private ComboBoxModel<String> grupoSanguineoModel;
-    private ComboBoxModel<String> factorSanguineoModel;
-    private ComboBoxModel<String> claseModel;
+    private final ComboBoxModel<String> grupoSanguineoModel;
+    private final ComboBoxModel<String> factorSanguineoModel;
+    private final ComboBoxModel<String> claseModel;
     private Clase claseSeleccionada;
-    private Boolean esDonanteSeleccionado;
     private TipoDocumento tipoDocumentoSeleccionado;
-    private FactorSanguineo factorSanguineoSeleccionado;
-    private GrupoSanguineo grupoSanguineoSeleccionado;
+    private Optional<Titular> titularEncontrado = Optional.empty();
+    private Optional<Integer> costo;
+    
+    static private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     /**
      * Creates new form VentanaEmitir
@@ -67,9 +70,9 @@ public class VentanaEmitir extends javax.swing.JDialog {
         }
         factorSanguineoModel = new DefaultComboBoxModel(factorSanguineoModelItems.toArray());
         
-        // Init factorSanguineoCombo
+        // Init claseCombo
         ArrayList<Character> claseModelItems = new ArrayList<>();
-        for (Clase clase: ventanaPrincipal.clases) {
+        for (Clase clase : Clase.values()) {
             claseModelItems.add(clase.letra);
         }
         claseModel = new DefaultComboBoxModel(claseModelItems.toArray());
@@ -80,7 +83,6 @@ public class VentanaEmitir extends javax.swing.JDialog {
         grupoSanguineoCombo.setSelectedIndex(0);
         factorSanguineoCombo.setSelectedIndex(0);
         claseCombo.setSelectedIndex(0);
-        esDonanteSeleccionado = false;
     }
 
     /**
@@ -121,6 +123,10 @@ public class VentanaEmitir extends javax.swing.JDialog {
         jSeparator3 = new javax.swing.JSeparator();
         emitirBtn = new javax.swing.JButton();
         esDonanteCheckbox = new javax.swing.JCheckBox();
+        jSeparator4 = new javax.swing.JSeparator();
+        buscarBtn = new javax.swing.JButton();
+        jLabel15 = new javax.swing.JLabel();
+        vigenciaLabel = new javax.swing.JLabel();
 
         jLabel12.setText("jLabel12");
 
@@ -129,7 +135,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
         jLabel1.setText("Tipo de Documento");
 
-        jLabel2.setText("Numero de Documento");
+        jLabel2.setText("Número de Documento");
 
         jLabel3.setText("Apellidos");
 
@@ -139,9 +145,9 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
         jLabel6.setText("Domicilio");
 
-        jLabel7.setText("Grupo Sanguineo");
+        jLabel7.setText("Grupo Sanguíneo");
 
-        jLabel8.setText("Factor Sanguineo");
+        jLabel8.setText("Factor Sanguíneo");
 
         jLabel9.setText("Es Donante");
 
@@ -158,21 +164,22 @@ public class VentanaEmitir extends javax.swing.JDialog {
             }
         });
 
+        apellidosTextField.setEditable(false);
+
+        nombresTextField.setEditable(false);
+
+        fechaNacimientoTextField.setEditable(false);
+
+        domicilioTextField.setEditable(false);
+
         grupoSanguineoCombo.setModel(grupoSanguineoModel);
-        grupoSanguineoCombo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                grupoSanguineoComboActionPerformed(evt);
-            }
-        });
+        grupoSanguineoCombo.setEnabled(false);
 
         factorSanguineoCombo.setModel(factorSanguineoModel);
-        factorSanguineoCombo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                factorSanguineoComboActionPerformed(evt);
-            }
-        });
+        factorSanguineoCombo.setEnabled(false);
 
         claseCombo.setModel(claseModel);
+        claseCombo.setEnabled(false);
         claseCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 claseComboActionPerformed(evt);
@@ -181,20 +188,28 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
         costoLabel.setText("-");
 
-        observacionesTextField.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        observacionesTextField.setEnabled(false);
 
         emitirBtn.setText("Emitir");
+        emitirBtn.setEnabled(false);
         emitirBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 emitirBtnActionPerformed(evt);
             }
         });
 
-        esDonanteCheckbox.addActionListener(new java.awt.event.ActionListener() {
+        esDonanteCheckbox.setEnabled(false);
+
+        buscarBtn.setText("Buscar");
+        buscarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                esDonanteCheckboxActionPerformed(evt);
+                buscarBtnActionPerformed(evt);
             }
         });
+
+        jLabel15.setText("Vigencia (años)");
+
+        vigenciaLabel.setText("-");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -209,10 +224,32 @@ public class VentanaEmitir extends javax.swing.JDialog {
                         .addComponent(observacionesTextField)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(103, 103, 103)
+                        .addComponent(jLabel10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(claseCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator2)
-                            .addComponent(jSeparator1)
-                            .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(costoLabel)
+                            .addComponent(vigenciaLabel))
+                        .addGap(77, 77, 77))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jSeparator3)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(emitirBtn)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel1)
@@ -230,33 +267,19 @@ public class VentanaEmitir extends javax.swing.JDialog {
                                             .addComponent(jLabel9))
                                         .addGap(53, 53, 53)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(nroDNITextField, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(nroDNITextField, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(buscarBtn))
                                             .addComponent(apellidosTextField)
                                             .addComponent(nombresTextField)
                                             .addComponent(fechaNacimientoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(domicilioTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                                            .addComponent(domicilioTextField)
                                             .addComponent(grupoSanguineoCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(esDonanteCheckbox)
                                             .addComponent(factorSanguineoCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                .addGap(0, 12, Short.MAX_VALUE)))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(69, 69, 69)
-                        .addComponent(jLabel10)
-                        .addGap(40, 40, 40)
-                        .addComponent(claseCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
-                        .addComponent(jLabel13)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(costoLabel)
-                        .addGap(77, 77, 77))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jSeparator3)
+                                .addGap(0, 37, Short.MAX_VALUE)))
                         .addContainerGap())))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(emitirBtn)
-                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -268,7 +291,10 @@ public class VentanaEmitir extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(nroDNITextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(nroDNITextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buscarBtn))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -300,12 +326,21 @@ public class VentanaEmitir extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(esDonanteCheckbox))
-                .addGap(14, 14, 14)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(claseCombo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(costoLabel, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(claseCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabel10))
+                            .addComponent(costoLabel, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(vigenciaLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(23, 23, 23)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -316,7 +351,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(emitirBtn)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -324,46 +359,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
     private void emitirBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_emitirBtnActionPerformed
         try {
-            DateTimeFormatter formatter =
-                              DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate fechaNacimiento = LocalDate.parse(fechaNacimientoTextField.getText(), formatter);
-            
-            if (nroDNITextField.getText().equals("")) {
-                throw new CampoVacioException("DNI");
-            }
-            
-            if (apellidosTextField.getText().equals("")) {
-                throw new CampoVacioException("Apellidos");
-            }
-            
-            if (nombresTextField.getText().equals("")) {
-                throw new CampoVacioException("Nombres");
-            }
-            
-            if (domicilioTextField.getText().equals("")) {
-                throw new CampoVacioException("Domicilio");
-            }
-            
-            if (fechaNacimientoTextField.getText().equals("")) {
-                throw new CampoVacioException("Fecha de Nacimiento");
-            }
-            
-            VentanaEmitirConfirmar ventanaEmitirConfirmar = new VentanaEmitirConfirmar(ventanaPrincipal, true);
-            ventanaEmitirConfirmar.setVisible(true);
-            
-            Titular unTitular = new Titular( //TODO: No crear un titular acá
-                tipoDocumentoSeleccionado, 
-                nroDNITextField.getText(),
-                apellidosTextField.getText(),
-                nombresTextField.getText(),
-                fechaNacimiento,
-                domicilioTextField.getText(),
-                grupoSanguineoSeleccionado,
-                factorSanguineoSeleccionado,
-                esDonanteSeleccionado
-            );
-            
-            List<Carnet> carnetsTitular = DAOCarnet.buscar(unTitular);
+            List<Carnet> carnetsTitular = DAOCarnet.buscar(titularEncontrado.get());
             
             Optional<Carnet> carnetMasUtil = Carnet.getCarnetAnteriorMasUtil(carnetsTitular);
             
@@ -371,45 +367,67 @@ public class VentanaEmitir extends javax.swing.JDialog {
                     carnetMasUtil,
                     claseSeleccionada,
                     observacionesTextField.getText(),
-                    unTitular
+                    titularEncontrado.get()
             );
             
-            unCarnet = DAOCarnet.insertar(unCarnet);
-
-            pdf unPdf = new pdf();
-            unPdf.emitirLicencia(unCarnet, unTitular);
+            VentanaEmitirConfirmar confirmar = new VentanaEmitirConfirmar(null, true, unCarnet, costo.get());
+            confirmar.setVisible(true);
+            
+            if(confirmar.confirmado) {
+                unCarnet = DAOCarnet.insertar(unCarnet);
+                
+                pdf unPdf = new pdf();
+                unPdf.emitirLicencia(unCarnet, titularEncontrado.get());
+                
+                dispose();
+            }
         }
-        catch (DateTimeParseException exc) {
+        catch (DateTimeParseException ex) {
             JOptionPane.showMessageDialog(null, "La fecha de nacimiento debe ser válida y estar en formato dd/mm/yyyy.");
-        } catch (CampoVacioException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage() + " no puede estar vacío.");
-        } catch (EsMenorException e) {
+        } catch (EsMenorException ex) {
             JOptionPane.showMessageDialog(null, "No se puede emitir a un menor.");
-        } catch (EsMenorParaProfesionalException e) {
+        } catch (EsMenorParaProfesionalException ex) {
             JOptionPane.showMessageDialog(null, "No cumple con edad mínima para el tipo profesional.");
-        } catch (EsMayorParaPrimerProfesionalException e) {
+        } catch (EsMayorParaPrimerProfesionalException ex) {
             JOptionPane.showMessageDialog(null, "Supera la edad máxima para primer carnet profesional.");
-        } catch (CarnetAnteriorRequeridoException | CarnetAnteriorInvalidoException e) {
+        } catch (CarnetAnteriorRequeridoException | CarnetAnteriorInvalidoException ex) {
             JOptionPane.showMessageDialog(null, "No cumple los requisitos de carnet B para carnet profesional.");
         } catch (IOException | DocumentException ex) {
             JOptionPane.showMessageDialog(null, "Error de escritura al generar el PDF.");
-        } catch (Carnet.EmisionException e) {
+        } catch (Carnet.EmisionException ex) {
             JOptionPane.showMessageDialog(null, "Error general de emisión.");
         }
     }//GEN-LAST:event_emitirBtnActionPerformed
 
     private void claseComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_claseComboActionPerformed
         JComboBox cb = (JComboBox)evt.getSource();
-        char letraClase = (char)cb.getSelectedItem();
-
-        for (Clase unaClase: ventanaPrincipal.clases) {
-            if (unaClase.letra == letraClase) {
-                claseSeleccionada = unaClase;
-                break;
-            }
-        }
+        claseSeleccionada = Clase.fromLetra((char) cb.getSelectedItem());
+        
+        if(titularEncontrado.isPresent()) actualizarVigenciaYCosto();
     }//GEN-LAST:event_claseComboActionPerformed
 
+    private void actualizarVigenciaYCosto() {
+        Optional<Vigencia> vigencia = Optional.empty();
+
+        try {
+            if(claseSeleccionada.isProfesional) {
+                vigencia = Optional.of(Carnet.vigenciaMaximaProfesional(titularEncontrado.get().getEdad()));
+            }
+            else {
+                boolean tuvoCarnet = DAOCarnet.buscar(titularEncontrado.get()).stream().anyMatch(c -> c.getClase() == claseSeleccionada);
+                vigencia = Optional.of(Carnet.vigenciaMaximaNoProfesional(titularEncontrado.get().getEdad(), tuvoCarnet));
+            }
+        } catch (EsMenorException | EsMenorParaProfesionalException ignore) {
+
+        }
+        
+        costo = vigencia.map(v -> Costo.calcularCosto(Costo.init(), claseSeleccionada, v));
+
+        vigenciaLabel.setText(vigencia.map(v -> String.valueOf(v.anos)).orElse("–"));
+        costoLabel.setText(costo.map(c -> String.valueOf(c)).orElse("–"));
+    }
+    
+    
     private void tipoDNIComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tipoDNIComboActionPerformed
         JComboBox cb = (JComboBox)evt.getSource();
         String nombreTipoDNI = (String)cb.getSelectedItem();
@@ -422,34 +440,34 @@ public class VentanaEmitir extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_tipoDNIComboActionPerformed
 
-    private void grupoSanguineoComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_grupoSanguineoComboActionPerformed
-        JComboBox cb = (JComboBox)evt.getSource();
-        String nombreGrupoSanguineo = (String)cb.getSelectedItem();
+    private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed
         
-        for (GrupoSanguineo unGrupoSanguineo: ventanaPrincipal.grupoSanguineos) {
-            if (unGrupoSanguineo.nombre.equals(nombreGrupoSanguineo)) {
-                grupoSanguineoSeleccionado = unGrupoSanguineo;
-                break;
-            }
+        try {
+            Titular titular = DAOTitular.obtener(tipoDocumentoSeleccionado, nroDNITextField.getText()).get();
+            
+            apellidosTextField.setText(titular.getApellidos());
+            nombresTextField.setText(titular.getNombres());
+            fechaNacimientoTextField.setText(titular.getFechaNacimiento().format(formatter));
+            domicilioTextField.setText(titular.getDireccion());
+            grupoSanguineoCombo.setSelectedItem(titular.getGrupoSanguineo());
+            factorSanguineoCombo.setSelectedItem(titular.getFactorSanguineo());
+            esDonanteCheckbox.setSelected(titular.isDonante());
+            
+            claseCombo.setEnabled(true);
+            observacionesTextField.setEnabled(true);
+            emitirBtn.setEnabled(true);
+            
+            titularEncontrado = Optional.of(titular);
+            actualizarVigenciaYCosto();
+            
+        } catch (NoSuchElementException ex) {
+            JOptionPane.showMessageDialog(null, "No se encuentra el titular.");
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(VentanaEmitir.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null, "Error de la base de datos.");
         }
-    }//GEN-LAST:event_grupoSanguineoComboActionPerformed
-
-    private void factorSanguineoComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_factorSanguineoComboActionPerformed
-        JComboBox cb = (JComboBox)evt.getSource();
-        char nombreFactorSanguineo = (char)cb.getSelectedItem();
-        
-        for (FactorSanguineo unFactorSanguineo: ventanaPrincipal.factorSanguineos) {
-            if (unFactorSanguineo.signo == nombreFactorSanguineo) {
-                factorSanguineoSeleccionado = unFactorSanguineo;
-                break;
-            }
-        }
-    }//GEN-LAST:event_factorSanguineoComboActionPerformed
-
-    private void esDonanteCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_esDonanteCheckboxActionPerformed
-        AbstractButton cb = (AbstractButton)evt.getSource();
-        esDonanteSeleccionado = cb.getModel().isSelected();
-    }//GEN-LAST:event_esDonanteCheckboxActionPerformed
+    }//GEN-LAST:event_buscarBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -495,6 +513,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField apellidosTextField;
+    private javax.swing.JButton buscarBtn;
     private javax.swing.JComboBox<String> claseCombo;
     private javax.swing.JLabel costoLabel;
     private javax.swing.JTextField domicilioTextField;
@@ -508,6 +527,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -519,10 +539,12 @@ public class VentanaEmitir extends javax.swing.JDialog {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JTextField nombresTextField;
     private javax.swing.JTextField nroDNITextField;
     private javax.swing.JTextField observacionesTextField;
     private javax.swing.JComboBox<String> tipoDNICombo;
+    private javax.swing.JLabel vigenciaLabel;
     // End of variables declaration//GEN-END:variables
 
     private static class CampoVacioException extends Exception {
