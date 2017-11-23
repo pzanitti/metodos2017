@@ -90,7 +90,9 @@ public class DAOTitular {
     public static List<Titular> buscarPorCriterios(Criterios criterios) throws SQLException {
         Objects.requireNonNull(criterios);
         
-        String sql = "SELECT * FROM titulares WHERE 1=1\n";
+        String sql = "SELECT tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante\n"
+                + "FROM titulares\n"
+                + "WHERE 1=1\n";
         
         if(criterios.apellidos.isPresent()) sql += "AND apellidos = ?\n";
         if(criterios.nombres.isPresent()) sql += "AND nombres = ?\n";
