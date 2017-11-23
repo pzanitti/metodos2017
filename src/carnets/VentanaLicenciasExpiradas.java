@@ -5,13 +5,29 @@
  */
 package carnets;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+
 
 public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
+    private List<Carnet> carnetsExpirados;
+    
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final VentanaPrincipal ventanaPrincipal = (VentanaPrincipal) this.getParent();
+    
+    private final DefaultTableModel tabla;
     
     public VentanaLicenciasExpiradas(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        tabla = (DefaultTableModel) JTExpirados.getModel();
     }
     
     
@@ -42,33 +58,45 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         jLabel2.setToolTipText("");
 
         jBtBuscar.setText("Buscar");
+        jBtBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtBuscarActionPerformed(evt);
+            }
+        });
 
         JTExpirados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""},
+                {"", ""}
             },
             new String [] {
                 "Nro de Licencia", "Fecha de Expiración"
             }
         ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
             boolean[] canEdit = new boolean [] {
                 false, false
             };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -76,6 +104,11 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         });
         JTExpirados.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         JTExpirados.setPreferredSize(new java.awt.Dimension(372, 240));
+        JTExpirados.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JTExpiradosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(JTExpirados);
         if (JTExpirados.getColumnModel().getColumnCount() > 0) {
             JTExpirados.getColumnModel().getColumn(0).setResizable(false);
@@ -128,6 +161,85 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jBtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtBuscarActionPerformed
+        boolean busca = false;
+        String desde = jTDesde.getText();
+        String hasta = jTHasta.getText();
+        
+        // LocalDate dF = null;
+        // LocalDate hF = null;
+        Optional<LocalDate> dFecha = Optional.empty();
+        LocalDate hFecha = LocalDate.now().minusDays(1);
+        
+        try {
+            
+            if (!desde.equals("")) {
+                // dF = LocalDate.parse(desde, formatter);
+                dFecha = Optional.of(LocalDate.parse(desde, formatter));
+            }
+            
+            if (!hasta.equals("")) {
+                // hF = LocalDate.parse(hasta, formatter);
+                hFecha = LocalDate.parse(hasta, formatter);
+            } 
+            //carnetsExpirados = DAOCarnet.expirados(Optional.of(LocalDate.parse(desde, formatter)), hFecha);
+            
+            //System.out.println(carnetsExpirados.size());
+            
+            carnetsExpirados = DAOCarnet.expirados(dFecha, hFecha);
+
+            limpiarTabla();
+
+            for(Carnet item : carnetsExpirados) {
+                tabla.addRow(new Object[] {item.getNumero().get(), item.getExpiracion().format(formatter)});
+            }
+            /*
+            tabla.addRow(new Object[] {1, 2});
+            tabla.addRow(new Object[] {10, 20});
+            tabla.addRow(new Object[] {100, 200});
+            */
+            rellenarTabla();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(VentanaLicenciasExpiradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jBtBuscarActionPerformed
+        
+    private void JTExpiradosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTExpiradosMouseClicked
+        
+        if (evt.getClickCount() == 2){
+            int fila = JTExpirados.getSelectedRow();
+
+            String nro = tabla.getValueAt(fila, 0).toString();
+            String fecha = tabla.getValueAt(fila, 1).toString();
+
+            if (!nro.equals("") && !fecha.equals("")) {
+                System.out.println(fila + " --> Nro: " + nro + " Fecha: " + fecha);
+            }
+        }
+    }//GEN-LAST:event_JTExpiradosMouseClicked
+    
+    private void limpiarTabla(){
+        int i = 0;
+        int filas = tabla.getRowCount();
+        
+        for (i = 1; i <= filas; i++){
+            tabla.removeRow(0);
+        }
+    }
+    
+    private void rellenarTabla(){
+        int i = 0;
+        int filas = tabla.getRowCount();
+        
+        if (filas < 16){
+            for (i = filas; i <= 16; i++){
+                tabla.addRow(new Object[] {"", ""});
+            }
+        }
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
