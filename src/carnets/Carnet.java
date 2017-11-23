@@ -12,6 +12,7 @@ public class Carnet {
     final private Clase clase;
     final private LocalDate emision;
     final private LocalDate expiracion;
+    final private String observaciones;
     final private Titular titular;
 
     public Optional<Integer> getNumero () {
@@ -37,12 +38,16 @@ public class Carnet {
     public boolean isExpirado() {
         return expiracion.isBefore(LocalDate.now());
     }
+    
+    public String getObservaciones() {
+        return observaciones;
+    }
 
     public Titular getTitular() {
         return titular;
     }
 
-    public Carnet(Optional<Carnet> carnetAnterior, Clase clase, Titular titular)
+    public Carnet(Optional<Carnet> carnetAnterior, Clase clase, String observaciones, Titular titular)
             throws EmisionException  {
         
         Objects.requireNonNull(carnetAnterior);
@@ -54,6 +59,7 @@ public class Carnet {
         this.numero = Optional.empty();
         this.emision = LocalDate.now();
         this.clase = clase;
+        this.observaciones = observaciones;
         this.titular = titular;
         
         int edad = titular.getEdad();
@@ -86,7 +92,7 @@ public class Carnet {
         this.expiracion = calcularExpiracion(emision, titular.getFechaNacimiento(), vigenciaMax);
     }
     
-    Carnet(int numero, Clase clase, LocalDate emision, LocalDate expiracion, Titular titular)
+    Carnet(int numero, Clase clase, LocalDate emision, LocalDate expiracion, String observaciones, Titular titular)
     {
         Objects.requireNonNull(clase);
         Objects.requireNonNull(emision);
@@ -99,6 +105,7 @@ public class Carnet {
         this.clase = clase;
         this.emision = emision;
         this.expiracion = expiracion;
+        this.observaciones = observaciones;
         this.titular = titular;     
     }
     

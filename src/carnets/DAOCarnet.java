@@ -18,8 +18,8 @@ public class DAOCarnet {
     public static Carnet insertar(Carnet carnet) {
         Objects.requireNonNull(carnet);
         
-        String sql = "INSERT INTO carnets(clase, emision, expiracion, tipoDocumento, numeroDocumento)\n"
-                + "VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO carnets(clase, emision, expiracion, observaciones, tipoDocumento, numeroDocumento)\n"
+                + "VALUES(?, ?, ?, ?, ?, ?)";
         
         try {
             Connection conn = DB.conectar();
@@ -27,8 +27,9 @@ public class DAOCarnet {
             pstmt.setString(1, Character.toString(carnet.getClase().letra));
             pstmt.setString(2, carnet.getEmision().toString());
             pstmt.setString(3, carnet.getExpiracion().toString());
-            pstmt.setString(4, carnet.getTitular().getTipoDocumento().nombre);
-            pstmt.setString(5, carnet.getTitular().getNumeroDocumento());
+            pstmt.setString(4, carnet.getObservaciones());
+            pstmt.setString(5, carnet.getTitular().getTipoDocumento().nombre);
+            pstmt.setString(6, carnet.getTitular().getNumeroDocumento());
             pstmt.executeUpdate();
             
             int numero;
@@ -41,7 +42,7 @@ public class DAOCarnet {
             
             DAOAuditoria.insertar("Emitida licencia " + numero + " a " + carnet.getTitular().getTipoDocumento().nombre + " " + carnet.getTitular().getNumeroDocumento());
             
-            return new Carnet(numero, carnet.getClase(), carnet.getEmision(), carnet.getExpiracion(), carnet.getTitular());
+            return new Carnet(numero, carnet.getClase(), carnet.getEmision(), carnet.getExpiracion(), carnet.getObservaciones(), carnet.getTitular());
         
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -56,7 +57,7 @@ public class DAOCarnet {
         List<Carnet> carnets = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         
-        String sql = "SELECT numero, clase, emision, expiracion\n" 
+        String sql = "SELECT numero, clase, emision, expiracion, observaciones\n" 
                + "FROM carnets WHERE\n"
                + "tipoDocumento = ? AND\n"
                + "numeroDocumento = ?";
@@ -76,6 +77,7 @@ public class DAOCarnet {
                         Clase.fromLetra(rs.getString("clase").charAt(0)),
                         LocalDate.parse(rs.getString("emision"), formatter),
                         LocalDate.parse(rs.getString("expiracion"), formatter),
+                        rs.getString("observaciones"),
                         unTitular
                 );
                 
@@ -94,7 +96,7 @@ public class DAOCarnet {
         Objects.requireNonNull(expiracionHasta);
         if(expiracionDesde.isPresent() && expiracionHasta.isBefore(expiracionDesde.get())) throw new IllegalArgumentException("expiracionHasta no puede ser anterior a la expiracionDesde");
         
-        String sql = "SELECT numero, clase, emision, expiracion, tipoDocumento, numeroDocumento\n"
+        String sql = "SELECT numero, clase, emision, expiracion, observaciones, tipoDocumento, numeroDocumento\n"
                 + "FROM carnets\n"
                 + "WHERE expiracion <= ?\n";
         
@@ -122,6 +124,7 @@ public class DAOCarnet {
                         Clase.fromLetra(rs.getString("clase").charAt(0)),
                         LocalDate.parse(rs.getString("emision"), formatter),
                         LocalDate.parse(rs.getString("expiracion"), formatter),
+                        rs.getString("observaciones"),
                         DAOTitular.obtener(TipoDocumento.fromNombre(rs.getString("tipoDocumento")), rs.getString("numeroDocumento")).get()
                 );
                 

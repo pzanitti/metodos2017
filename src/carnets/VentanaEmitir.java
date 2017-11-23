@@ -351,17 +351,17 @@ public class VentanaEmitir extends javax.swing.JDialog {
             VentanaEmitirConfirmar ventanaEmitirConfirmar = new VentanaEmitirConfirmar(ventanaPrincipal, true);
             ventanaEmitirConfirmar.setVisible(true);
             
-            Titular unTitular = new Titular(
-            tipoDocumentoSeleccionado, 
-            nroDNITextField.getText(),
-            apellidosTextField.getText(),
-            nombresTextField.getText(),
-            fechaNacimiento,
-            domicilioTextField.getText(),
-            grupoSanguineoSeleccionado,
-            factorSanguineoSeleccionado,
-            esDonanteSeleccionado,
-            observacionesTextField.getText());
+            Titular unTitular = new Titular( //TODO: No crear un titular acá
+                tipoDocumentoSeleccionado, 
+                nroDNITextField.getText(),
+                apellidosTextField.getText(),
+                nombresTextField.getText(),
+                fechaNacimiento,
+                domicilioTextField.getText(),
+                grupoSanguineoSeleccionado,
+                factorSanguineoSeleccionado,
+                esDonanteSeleccionado
+            );
             
             List<Carnet> carnetsTitular = DAOCarnet.buscar(unTitular);
             
@@ -370,7 +370,9 @@ public class VentanaEmitir extends javax.swing.JDialog {
             Carnet unCarnet = new Carnet(
                     carnetMasUtil,
                     claseSeleccionada,
-                    unTitular);
+                    observacionesTextField.getText(),
+                    unTitular
+            );
             
             unCarnet = DAOCarnet.insertar(unCarnet);
 

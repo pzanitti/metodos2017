@@ -33,6 +33,7 @@ public class DB {
                 + " clase char NOT NULL,\n"
                 + " emision TEXT NOT NULL,\n"
                 + " expiracion TEXT NOT NULL,\n"
+                + " observaciones TEXT NOT NULL,\n"
                 + " tipoDocumento TEXT NOT NULL,\n"
                 + " numeroDocumento TEXT NOT NULL,\n"
                 + " FOREIGN KEY(tipoDocumento, numeroDocumento) REFERENCES titulares(tipoDocumento, numeroDocumento)"
@@ -49,7 +50,6 @@ public class DB {
                 + " grupoSanguineo TEXT NOT NULL,\n"
                 + " factorSanguineo TEXT NOT NULL,\n"
                 + " esDonante INTEGER NOT NULL,\n"
-                + " observaciones TEXT NOT NULL,\n"
                 + " PRIMARY KEY (tipoDocumento, numeroDocumento)\n"
                 + ");";
             stmt.execute(sql);

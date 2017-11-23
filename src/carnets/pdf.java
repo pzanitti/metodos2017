@@ -45,7 +45,7 @@ public class pdf {
         content = content.replace("{{ grupoSanguineo }}", titular.getGrupoSanguineo().nombre);
         content = content.replace("{{ factorSanguineo }}", Character.toString(titular.getFactorSanguineo().signo));
         content = content.replace("{{ donante }}", titular.isDonante()? "Sí" : "No");
-        content = content.replace("{{ observaciones }}", titular.getObservaciones());
+        content = content.replace("{{ observaciones }}", carnet.getObservaciones());
         
         PdfPTable table = new PdfPTable(1);
         PdfPCell cell = new PdfPCell();

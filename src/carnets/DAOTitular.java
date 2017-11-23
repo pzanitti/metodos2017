@@ -16,8 +16,8 @@ public class DAOTitular {
         Objects.requireNonNull(titular);
         
         int val = 0;
-        String sql = "INSERT INTO titulares(tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante, observaciones)\n"
-                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO titulares(tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante)\n"
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try {
             Connection conn = DB.conectar();
@@ -32,7 +32,6 @@ public class DAOTitular {
             pstmt.setString(7, titular.getGrupoSanguineo().getGrupoSanguineo());
             pstmt.setString(8, titular.getFactorSanguineo().getFactor());
             pstmt.setBoolean(9, titular.isDonante());
-            pstmt.setString(10, titular.getObservaciones());
             
             val = pstmt.executeUpdate();
             
@@ -50,7 +49,7 @@ public class DAOTitular {
         Objects.requireNonNull(tipoDocumento);
         Objects.requireNonNull(numeroDocumento);
         
-        String sql = "SELECT apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante, observaciones\n"
+        String sql = "SELECT apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante\n"
                + "FROM titulares \n"
                + "WHERE tipoDocumento = ? AND\n"
                + "numeroDocumento = ?";
@@ -72,8 +71,7 @@ public class DAOTitular {
                         rs.getString("direccion"),
                         GrupoSanguineo.valueOf(rs.getString("grupoSanguineo")),
                         rs.getString("factorSanguineo").equals("+") ? FactorSanguineo.POSITIVO : FactorSanguineo.NEGATIVO,
-                        rs.getBoolean("esDonante"),
-                        rs.getString("observaciones")
+                        rs.getBoolean("esDonante")
                 );
                 
                 return Optional.of(titular);
@@ -125,8 +123,7 @@ public class DAOTitular {
                         rs.getString("direccion"),
                         GrupoSanguineo.valueOf(rs.getString("grupoSanguineo")),
                         rs.getString("factorSanguineo").equals("+") ? FactorSanguineo.POSITIVO : FactorSanguineo.NEGATIVO,
-                        rs.getBoolean("esDonante"),
-                        rs.getString("observaciones")
+                        rs.getBoolean("esDonante")
                 );
                 
                 assert(criterios.coinciden(titular));

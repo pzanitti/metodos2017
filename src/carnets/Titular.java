@@ -13,20 +13,18 @@ public class Titular {
     private final GrupoSanguineo grupoSanguineo;
     private final FactorSanguineo factorSanguineo;
     private final boolean esDonante;
-    private final String observaciones;
 
-    public Titular(TipoDocumento tipoDocumento, String numeroDocumento, String apellidos, String nombres, LocalDate fechaNacimiento, String direccion, GrupoSanguineo grupoSanguineo, FactorSanguineo factorSanguineo, Boolean esDonante, String observaciones) {
+    public Titular(TipoDocumento tipoDocumento, String numeroDocumento, String apellidos, String nombres, LocalDate fechaNacimiento, String direccion, GrupoSanguineo grupoSanguineo, FactorSanguineo factorSanguineo, boolean esDonante) {
         Objects.requireNonNull(tipoDocumento);
         Objects.requireNonNull(apellidos);
         if(apellidos.isEmpty()) throw new IllegalArgumentException();
         Objects.requireNonNull(nombres);
         if(nombres.isEmpty()) throw new IllegalArgumentException();
         Objects.requireNonNull(fechaNacimiento);
-        if(fechaNacimiento.compareTo(LocalDate.now()) > 0) throw new IllegalArgumentException("fechaNacimiento no puede ser posterior a la fecha actual");
+        if(fechaNacimiento.isAfter(LocalDate.now())) throw new IllegalArgumentException("fechaNacimiento no puede ser posterior a la fecha actual");
         Objects.requireNonNull(direccion);
         Objects.requireNonNull(grupoSanguineo);
         Objects.requireNonNull(factorSanguineo);
-        Objects.requireNonNull(observaciones);
 
         this.tipoDocumento = tipoDocumento;
         this.numeroDocumento = numeroDocumento;
@@ -37,7 +35,6 @@ public class Titular {
         this.grupoSanguineo = grupoSanguineo;
         this.factorSanguineo = factorSanguineo;
         this.esDonante = esDonante;
-        this.observaciones = observaciones;
     }
     
     public TipoDocumento getTipoDocumento () {
@@ -88,11 +85,7 @@ public class Titular {
         return esDonante;
     }
 
-    public String getObservaciones() {
-        return observaciones;
-    }
-    
-        @Override
+    @Override
     public int hashCode() {
         int hash = 5;
         hash = 47 * hash + Objects.hashCode(this.tipoDocumento);
