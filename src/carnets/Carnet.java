@@ -69,8 +69,7 @@ public class Carnet {
         if(!clase.isProfesional) {
             if (edad < 17) throw new EsMenorException();
             
-            boolean tuvoCarnetMismaClase = carnetAnterior.map(ca -> ca.getClase() == clase && ca.getAntiguedad() >= 1).orElse(false);
-            
+            boolean tuvoCarnetMismaClase = carnetAnterior.map(ca -> ca.getClase() == clase).orElse(false);
             vigenciaMax = vigenciaMaximaNoProfesional(edad, tuvoCarnetMismaClase);
             
         }
