@@ -40,24 +40,24 @@ public class DB {
             stmt.execute(sql);
             
             sql = "CREATE TABLE IF NOT EXISTS titulares (\n"
-                + " tipoDocumento string NOT NULL,\n"
-                + " numeroDocumento string NOT NULL,\n"
-                + " apellidos string NOT NULL,\n"
-                + " nombres string NOT NULL,\n"
+                + " tipoDocumento TEXT NOT NULL,\n"
+                + " numeroDocumento TEXT NOT NULL,\n"
+                + " apellidos TEXT NOT NULL,\n"
+                + " nombres TEXT NOT NULL,\n"
                 + " fechaNacimiento TEXT NOT NULL,\n"
-                + " direccion string NOT NULL,\n"
-                + " grupoSanguineo string NOT NULL,\n"
-                + " factorSanguineo string NOT NULL,\n"
-                + " esDonante integer NOT NULL,\n"
-                + " observaciones string NOT NULL,\n"
+                + " direccion TEXT NOT NULL,\n"
+                + " grupoSanguineo TEXT NOT NULL,\n"
+                + " factorSanguineo TEXT NOT NULL,\n"
+                + " esDonante INTEGER NOT NULL,\n"
+                + " observaciones TEXT NOT NULL,\n"
                 + " PRIMARY KEY (tipoDocumento, numeroDocumento)\n"
                 + ");";
             stmt.execute(sql);
             
             sql = "CREATE TABLE IF NOT EXISTS auditoria (\n"
-                + " numero integer PRIMARY KEY AUTOINCREMENT,\n"
-                + " timestamp string NOT NULL,\n"
-                + " descripcion string NOT NULL\n"
+                + " numero INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                + " timestamp TEXT NOT NULL,\n"
+                + " descripcion TEXT NOT NULL\n"
                 + ");";
             stmt.execute(sql);
         } catch (SQLException e) {
