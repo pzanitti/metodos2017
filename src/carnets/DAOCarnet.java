@@ -87,11 +87,11 @@ public class DAOCarnet {
         return carnets;
     }
     
-    public static List<Carnet> expirados(Optional<LocalDate> expiracionDesde, Optional<LocalDate> expiracionHasta) throws SQLException
+    public static List<Carnet> expirados(Optional<LocalDate> expiracionDesde, LocalDate expiracionHasta) throws SQLException
     {
         Objects.requireNonNull(expiracionDesde);
         Objects.requireNonNull(expiracionHasta);
-        if(expiracionHasta.isPresent() && !expiracionHasta.get().isBefore(LocalDate.now())) throw new IllegalArgumentException("expiracionHasta debe ser anterior a la fecha actual");
+        if(expiracionDesde.isPresent() && expiracionHasta.isBefore(expiracionDesde.get())) throw new IllegalArgumentException("expiracionHasta no puede ser anterior a la expiracionDesde");
         
         String sql = "SELECT * FROM carnets WHERE expiracion < ?\n";//" +  +  "\"\n";
         
@@ -104,7 +104,7 @@ public class DAOCarnet {
         try {
             Connection conn = DB.conectar();
             PreparedStatement pstmt  = conn.prepareStatement(sql);
-            pstmt.setString(1, expiracionHasta.orElse(LocalDate.now()).toString());
+            pstmt.setString(1, expiracionHasta.toString());
             if(expiracionDesde.isPresent()) pstmt.setString(2, expiracionDesde.get().toString());
             ResultSet rs    = pstmt.executeQuery();
             
