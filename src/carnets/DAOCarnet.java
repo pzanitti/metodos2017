@@ -18,8 +18,8 @@ public class DAOCarnet {
     public static Carnet insertar(Carnet carnet) {
         Objects.requireNonNull(carnet);
         
-        String sql = "INSERT INTO carnets VALUES\n"
-                + "(null, ?,?,?,?,?)";
+        String sql = "INSERT INTO carnets(clase, emision, expiracion, tipoDocumento, numeroDocumento)\n"
+                + "VALUES(?, ?, ?, ?, ?)";
         
         try {
             Connection conn = DB.conectar();
@@ -56,7 +56,8 @@ public class DAOCarnet {
         List<Carnet> carnets = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         
-        String sql = "SELECT * FROM carnets WHERE\n"
+        String sql = "SELECT numero, clase, emision, expiracion\n" 
+               + "FROM carnets WHERE\n"
                + "tipoDocumento = ? AND\n"
                + "numeroDocumento = ?";
         
@@ -93,7 +94,9 @@ public class DAOCarnet {
         Objects.requireNonNull(expiracionHasta);
         if(expiracionDesde.isPresent() && expiracionHasta.isBefore(expiracionDesde.get())) throw new IllegalArgumentException("expiracionHasta no puede ser anterior a la expiracionDesde");
         
-        String sql = "SELECT * FROM carnets WHERE expiracion <= ?\n";//" +  +  "\"\n";
+        String sql = "SELECT numero, clase, emision, expiracion, tipoDocumento, numeroDocumento\n"
+                + "FROM carnets\n"
+                + "WHERE expiracion <= ?\n";
         
         if(expiracionDesde.isPresent()) {
             sql += "AND expiracion >= ?\n";
@@ -147,18 +150,4 @@ public class DAOCarnet {
         
         return ret;
     }
-    
-    
-    /*
-    -- SELECT *
-    -- FROM `carnets` `C`
-    --  INNER JOIN `titular` `T` ON (`C`.`tipoDocumento` = `T`.`tipoDocumento` AND `C`.`numeroDocumento` = `T`.`numeroDocumento`)
-
-    SELECT `C`.`numero`, `C`.`clase`, `C`.`emision`, `C`.`expiracion`, `T`.`apellidos`, `T`.`nombres`, `C`.`tipoDocumento`, `C`.`numeroDocumento`
-    FROM `carnets` `C`
-      INNER JOIN `titular` `T` ON (`C`.`tipoDocumento` = `T`.`tipoDocumento` AND `C`.`numeroDocumento` = `T`.`numeroDocumento`)
-    WHERE CAST(substr(`C`.`expiracion`,1,4) as INTEGER) <= 2019 -- Año
-      AND CAST(substr(`C`.`expiracion`,6,2) as INTEGER) <= 1 -- Mes
-      AND CAST(substr(`C`.`expiracion`,9,2) as INTEGER) <= 11 -- Dia
-    */
 }

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 public class DAOAuditoria {
     public static void insertar(String descripcion) {
-        String sql = "INSERT INTO auditoria(timestamp,descripcion) VALUES\n"
+        String sql = "INSERT INTO auditoria(timestamp, descripcion) VALUES\n"
                 + "(?, ?)";
         
         try {

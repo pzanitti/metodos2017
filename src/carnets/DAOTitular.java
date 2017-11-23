@@ -16,8 +16,8 @@ public class DAOTitular {
         Objects.requireNonNull(titular);
         
         int val = 0;
-        String sql = "INSERT INTO titulares VALUES\n"
-                + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO titulares(tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante, observaciones)\n"
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try {
             Connection conn = DB.conectar();
@@ -50,9 +50,10 @@ public class DAOTitular {
         Objects.requireNonNull(tipoDocumento);
         Objects.requireNonNull(numeroDocumento);
         
-        String sql = "SELECT * FROM titulares WHERE\n"
-               + " tipoDocumento = ? AND\n"
-               + " numeroDocumento = ?";
+        String sql = "SELECT apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante, observaciones\n"
+               + "FROM titulares \n"
+               + "WHERE tipoDocumento = ? AND\n"
+               + "numeroDocumento = ?";
         try {
             Connection conn = DB.conectar();
             PreparedStatement pstmt  = conn.prepareStatement(sql);
