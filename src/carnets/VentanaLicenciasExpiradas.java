@@ -5,6 +5,17 @@
  */
 package carnets;
 
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 
 public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
     private final VentanaPrincipal ventanaPrincipal = (VentanaPrincipal) this.getParent();
@@ -42,6 +53,11 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         jLabel2.setToolTipText("");
 
         jBtBuscar.setText("Buscar");
+        jBtBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtBuscarActionPerformed(evt);
+            }
+        });
 
         JTExpirados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -128,6 +144,50 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jBtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtBuscarActionPerformed
+        try {
+            if (jTDesde.getText().equals("")) {
+                throw new CampoVacioException("DESDE");
+            }
+            if (jTHasta.getText().equals("")) {
+                throw new CampoVacioException("HASTA");
+            }
+            
+            DateTimeFormatter formatter =
+                              DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate desde = LocalDate.parse(jTDesde.getText(), formatter);
+            LocalDate hasta = LocalDate.parse(jTHasta.getText(), formatter);
+            
+            
+            Optional<LocalDate> expiracionDesde = Optional.of(desde);
+            Optional<LocalDate> expiracionHasta = Optional.of(hasta);
+
+            List<Carnet> listaExpirados = DAOCarnet.expirados(expiracionDesde, expiracionHasta);
+            
+            DefaultTableModel model = (DefaultTableModel) JTExpirados.getModel();
+            
+            //Borramos todas las filas
+            int rowCount = model.getRowCount();
+            for (int i = rowCount - 1; i >= 0; i--) {
+                model.removeRow(i);
+            }
+            
+            //llenamos el modelo con la lista
+            listaExpirados.forEach((c) -> {
+                model.addRow(new Object[]{c.getNumero().get(), c.getExpiracion().format(formatter)});
+            });
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage());
+        } catch (CampoVacioException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage() + " no puede estar vacío.");
+        } catch (DateTimeParseException e) {
+            JOptionPane.showMessageDialog(null, "Una o ambas fechas no son válidas. Deben estar en formato dd/mm/yyyy.");
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
+        }
+    }//GEN-LAST:event_jBtBuscarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -180,4 +240,10 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
     private javax.swing.JTextField jTDesde;
     private javax.swing.JTextField jTHasta;
     // End of variables declaration//GEN-END:variables
+    
+    private static class CampoVacioException extends Exception {
+        public CampoVacioException(String campo) {
+            super(campo);
+        }
+    }
 }
