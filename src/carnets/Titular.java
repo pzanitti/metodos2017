@@ -16,6 +16,8 @@ public class Titular {
 
     public Titular(TipoDocumento tipoDocumento, String numeroDocumento, String apellidos, String nombres, LocalDate fechaNacimiento, String direccion, GrupoSanguineo grupoSanguineo, FactorSanguineo factorSanguineo, boolean esDonante) {
         Objects.requireNonNull(tipoDocumento);
+        Objects.requireNonNull(numeroDocumento);
+        if(numeroDocumento.isEmpty()) throw new IllegalArgumentException();
         Objects.requireNonNull(apellidos);
         if(apellidos.isEmpty()) throw new IllegalArgumentException();
         Objects.requireNonNull(nombres);
