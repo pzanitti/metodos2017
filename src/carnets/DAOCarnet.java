@@ -46,7 +46,7 @@ public class DAOCarnet {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        assert(false);
+        assert false;
         return null;
     };
     
@@ -93,10 +93,10 @@ public class DAOCarnet {
         Objects.requireNonNull(expiracionHasta);
         if(expiracionDesde.isPresent() && expiracionHasta.isBefore(expiracionDesde.get())) throw new IllegalArgumentException("expiracionHasta no puede ser anterior a la expiracionDesde");
         
-        String sql = "SELECT * FROM carnets WHERE expiracion < ?\n";//" +  +  "\"\n";
+        String sql = "SELECT * FROM carnets WHERE expiracion <= ?\n";//" +  +  "\"\n";
         
         if(expiracionDesde.isPresent()) {
-            sql += "AND expiracion > ?\n";
+            sql += "AND expiracion >= ?\n";
         }
         
         sql += "ORDER BY expiracion ASC";
@@ -122,8 +122,6 @@ public class DAOCarnet {
                         DAOTitular.obtener(TipoDocumento.fromNombre(rs.getString("tipoDocumento")), rs.getString("numeroDocumento")).get()
                 );
                 
-                assert(carnet.isExpirado());
-                
                 ret.add(carnet);
                 
             }
@@ -145,7 +143,7 @@ public class DAOCarnet {
                                     .filter(c -> !c.isExpirado())
                                     .collect(Collectors.toList());
         
-        assert(ret.stream().allMatch(c -> !c.isExpirado() && criterios.coinciden(c.getTitular())));
+        assert ret.stream().allMatch(c -> !c.isExpirado() && criterios.coinciden(c.getTitular()));
         
         return ret;
     }
