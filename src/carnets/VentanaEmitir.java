@@ -127,35 +127,38 @@ public class VentanaEmitir extends javax.swing.JDialog {
         buscarBtn = new javax.swing.JButton();
         jLabel15 = new javax.swing.JLabel();
         vigenciaLabel = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
 
         jLabel12.setText("jLabel12");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Emitir Licencia");
+        setTitle("Emitir licencia");
 
-        jLabel1.setText("Tipo de Documento");
+        jLabel1.setText("Tipo de documento:");
 
-        jLabel2.setText("Número de Documento");
+        jLabel2.setText("Número de documento:");
 
-        jLabel3.setText("Apellidos");
+        jLabel3.setText("Apellidos:");
 
-        jLabel4.setText("Nombres");
+        jLabel4.setText("Nombres:");
 
-        jLabel5.setText("Fecha de Nacimiento");
+        jLabel5.setText("Fecha de nacimiento:");
 
-        jLabel6.setText("Domicilio");
+        jLabel6.setText("Domicilio:");
 
-        jLabel7.setText("Grupo Sanguíneo");
+        jLabel7.setText("Grupo sanguíneo:");
 
-        jLabel8.setText("Factor Sanguíneo");
+        jLabel8.setText("Factor sanguíneo:");
 
-        jLabel9.setText("Es Donante");
+        jLabel9.setText("Donante:");
 
-        jLabel10.setText("Clase");
+        jLabel10.setText("Clase:");
 
-        jLabel13.setText("Costo   $");
+        jLabel13.setText("Costo:   $");
 
-        jLabel14.setText("Observaciones");
+        jLabel14.setText("Observaciones:");
 
         tipoDNICombo.setModel(tipoDNIModel);
         tipoDNICombo.addActionListener(new java.awt.event.ActionListener() {
@@ -207,22 +210,26 @@ public class VentanaEmitir extends javax.swing.JDialog {
             }
         });
 
-        jLabel15.setText("Vigencia (años)");
+        jLabel15.setText("Vigencia (años):");
 
         vigenciaLabel.setText("-");
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel11.setText("Emitir licencia");
+
+        jLabel16.setFont(new java.awt.Font("Lucida Grande", 2, 13)); // NOI18N
+        jLabel16.setText("seleccione la clase de licencia a emitir.");
+
+        jLabel17.setFont(new java.awt.Font("Lucida Grande", 2, 13)); // NOI18N
+        jLabel17.setText("Busque un titular por su documento, verifique sus datos, y");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel14)
-                        .addGap(18, 18, 18)
-                        .addComponent(observacionesTextField)
-                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGap(103, 103, 103)
                         .addComponent(jLabel10)
@@ -278,13 +285,30 @@ public class VentanaEmitir extends javax.swing.JDialog {
                                             .addComponent(grupoSanguineoCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(esDonanteCheckbox)
                                             .addComponent(factorSanguineoCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                .addGap(0, 37, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                                .addGap(0, 15, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel14)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(observacionesTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel11)
+                            .addComponent(jLabel16)
+                            .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel17)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel16)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(tipoDNICombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -344,7 +368,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
                 .addGap(23, 23, 23)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(observacionesTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel14))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -524,10 +548,13 @@ public class VentanaEmitir extends javax.swing.JDialog {
     private javax.swing.JComboBox<String> grupoSanguineoCombo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
