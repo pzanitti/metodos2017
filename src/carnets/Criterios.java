@@ -44,7 +44,7 @@ public class Criterios {
         if(apellidos.isPresent() && !apellidos.get().equals(titular.getApellidos())) return false;
         if(nombres.isPresent() && !nombres.get().equals(titular.getNombres())) return false;
         if(grupoSanguineo.isPresent() && grupoSanguineo.get() != titular.getGrupoSanguineo()) return false;
-        if(factorSanguineo.isPresent() && factorSanguineo.get() == titular.getFactorSanguineo()) return false;
+        if(factorSanguineo.isPresent() && factorSanguineo.get() != titular.getFactorSanguineo()) return false;
         if(donante.isPresent() && donante.get() != titular.isDonante()) return false;
         
         return true;
