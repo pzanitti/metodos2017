@@ -256,15 +256,9 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         if (evt.getClickCount() == 2){
             int fila = JTExpirados.getSelectedRow();
             Carnet c = listaExpirados.get(fila);
-
-            System.out.println(fila + " --> Nro: " + c.getNumero().toString() + " Fecha: " + c.getExpiracion().format(formatter));
-                    
-            String nro = modeloTabla.getValueAt(fila, 0).toString();
-            String fecha = modeloTabla.getValueAt(fila, 1).toString();
-
-            if (!nro.equals("") && !fecha.equals("")) {
-                System.out.println(fila + " --> Nro: " + nro + " Fecha: " + fecha);
-            }
+            
+            VentanaDetallesCarnet ventanaDetallesCarnet = new VentanaDetallesCarnet(null, true, c, 0);
+            ventanaDetallesCarnet.setVisible(true);
         }
     }//GEN-LAST:event_JTExpiradosMouseClicked
 
