@@ -16,8 +16,8 @@ public class DAOTitular {
         Objects.requireNonNull(titular);
         
         int val = 0;
-        String sql = "INSERT INTO titulares VALUES\n"
-                + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO titulares(tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante)\n"
+                + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try {
             Connection conn = DB.conectar();
@@ -32,7 +32,6 @@ public class DAOTitular {
             pstmt.setString(7, titular.getGrupoSanguineo().getGrupoSanguineo());
             pstmt.setString(8, titular.getFactorSanguineo().getFactor());
             pstmt.setBoolean(9, titular.isDonante());
-            pstmt.setString(10, titular.getObservaciones());
             
             val = pstmt.executeUpdate();
             
@@ -50,9 +49,10 @@ public class DAOTitular {
         Objects.requireNonNull(tipoDocumento);
         Objects.requireNonNull(numeroDocumento);
         
-        String sql = "SELECT * FROM titulares WHERE\n"
-               + " tipoDocumento = ? AND\n"
-               + " numeroDocumento = ?";
+        String sql = "SELECT apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante\n"
+               + "FROM titulares \n"
+               + "WHERE tipoDocumento = ? AND\n"
+               + "numeroDocumento = ?";
         try {
             Connection conn = DB.conectar();
             PreparedStatement pstmt  = conn.prepareStatement(sql);
@@ -71,8 +71,7 @@ public class DAOTitular {
                         rs.getString("direccion"),
                         GrupoSanguineo.valueOf(rs.getString("grupoSanguineo")),
                         rs.getString("factorSanguineo").equals("+") ? FactorSanguineo.POSITIVO : FactorSanguineo.NEGATIVO,
-                        rs.getBoolean("esDonante"),
-                        rs.getString("observaciones")
+                        rs.getBoolean("esDonante")
                 );
                 
                 return Optional.of(titular);
@@ -91,7 +90,9 @@ public class DAOTitular {
     public static List<Titular> buscarPorCriterios(Criterios criterios) throws SQLException {
         Objects.requireNonNull(criterios);
         
-        String sql = "SELECT * FROM titulares WHERE 1=1\n";
+        String sql = "SELECT tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante\n"
+                + "FROM titulares\n"
+                + "WHERE 1=1\n";
         
         if(criterios.apellidos.isPresent()) sql += "AND apellidos = ?\n";
         if(criterios.nombres.isPresent()) sql += "AND nombres = ?\n";
@@ -124,8 +125,7 @@ public class DAOTitular {
                         rs.getString("direccion"),
                         GrupoSanguineo.valueOf(rs.getString("grupoSanguineo")),
                         rs.getString("factorSanguineo").equals("+") ? FactorSanguineo.POSITIVO : FactorSanguineo.NEGATIVO,
-                        rs.getBoolean("esDonante"),
-                        rs.getString("observaciones")
+                        rs.getBoolean("esDonante")
                 );
                 
                 assert(criterios.coinciden(titular));

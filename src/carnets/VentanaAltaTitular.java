@@ -5,22 +5,14 @@
  */
 package carnets;
 
-import carnets.Titular;
-
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import java.awt.Component;
 import javax.swing.AbstractButton;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 
@@ -31,9 +23,9 @@ import javax.swing.JOptionPane;
 public class VentanaAltaTitular extends javax.swing.JDialog {
     private final VentanaPrincipal ventanaPrincipal = (VentanaPrincipal) this.getParent();
     private final ComboBoxModel<String> tipoDNIModel;
-    private ComboBoxModel<String> grupoSanguineoModel;
-    private ComboBoxModel<String> factorSanguineoModel;
-    private Boolean esDonanteSeleccionado;
+    private final ComboBoxModel<String> grupoSanguineoModel;
+    private final ComboBoxModel<String> factorSanguineoModel;
+    private boolean esDonanteSeleccionado;
     private TipoDocumento tipoDocumentoSeleccionado;
     private FactorSanguineo factorSanguineoSeleccionado;
     private GrupoSanguineo grupoSanguineoSeleccionado;
@@ -92,8 +84,6 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
-        jLabel14 = new javax.swing.JLabel();
         tipoDNICombo = new javax.swing.JComboBox<>();
         nroDNITextField = new javax.swing.JTextField();
         apellidosTextField = new javax.swing.JTextField();
@@ -102,35 +92,33 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
         domicilioTextField = new javax.swing.JTextField();
         grupoSanguineoCombo = new javax.swing.JComboBox<>();
         factorSanguineoCombo = new javax.swing.JComboBox<>();
-        observacionesTextField = new javax.swing.JTextField();
-        jSeparator3 = new javax.swing.JSeparator();
         altaBtn = new javax.swing.JButton();
         esDonanteCheckbox = new javax.swing.JCheckBox();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
 
         jLabel12.setText("jLabel12");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Alta de Titular");
 
-        jLabel1.setText("Tipo de Documento");
+        jLabel1.setText("Tipo de documento:");
 
-        jLabel2.setText("Numero de Documento");
+        jLabel2.setText("Número de documento:");
 
-        jLabel3.setText("Apellidos");
+        jLabel3.setText("Apellidos:");
 
-        jLabel4.setText("Nombres");
+        jLabel4.setText("Nombres:");
 
-        jLabel5.setText("Fecha de Nacimiento");
+        jLabel5.setText("Fecha de nacimiento:");
 
-        jLabel6.setText("Domicilio");
+        jLabel6.setText("Domicilio:");
 
-        jLabel7.setText("Grupo Sanguineo");
+        jLabel7.setText("Grupo sanguíneo:");
 
-        jLabel8.setText("Factor Sanguineo");
+        jLabel8.setText("Factor sanguíneo:");
 
-        jLabel9.setText("Es Donante");
-
-        jLabel14.setText("Observaciones");
+        jLabel9.setText("Donante:");
 
         tipoDNICombo.setModel(tipoDNIModel);
         tipoDNICombo.addActionListener(new java.awt.event.ActionListener() {
@@ -153,7 +141,7 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
             }
         });
 
-        altaBtn.setText("Alta");
+        altaBtn.setText("Dar de alta");
         altaBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 titularBtnActionPerformed(evt);
@@ -166,6 +154,12 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
             }
         });
 
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel11.setText("Dar de alta un titular");
+
+        jLabel17.setFont(new java.awt.Font("Lucida Grande", 2, 13)); // NOI18N
+        jLabel17.setText("Ingrese los datos del titular a añadir al sistema.");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -174,53 +168,43 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel14)
-                        .addGap(18, 18, 18)
-                        .addComponent(observacionesTextField)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator2)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel1)
-                                        .addGap(70, 70, 70)
-                                        .addComponent(tipoDNICombo, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel2)
-                                            .addComponent(jLabel3)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel5)
-                                            .addComponent(jLabel6)
-                                            .addComponent(jLabel7)
-                                            .addComponent(jLabel8)
-                                            .addComponent(jLabel9))
-                                        .addGap(53, 53, 53)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(nroDNITextField, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(apellidosTextField)
-                                            .addComponent(nombresTextField)
-                                            .addComponent(fechaNacimientoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(domicilioTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                                            .addComponent(grupoSanguineoCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(esDonanteCheckbox)
-                                            .addComponent(factorSanguineoCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                .addGap(0, 12, Short.MAX_VALUE)))
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jSeparator3)
-                        .addContainerGap())))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(altaBtn)
-                .addContainerGap())
+                        .addComponent(jLabel1)
+                        .addGap(70, 70, 70)
+                        .addComponent(tipoDNICombo, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(altaBtn)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel2)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel4)
+                                .addComponent(jLabel5)
+                                .addComponent(jLabel6)
+                                .addComponent(jLabel7)
+                                .addComponent(jLabel8)
+                                .addComponent(jLabel9))
+                            .addGap(53, 53, 53)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(nroDNITextField, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(apellidosTextField)
+                                .addComponent(nombresTextField)
+                                .addComponent(fechaNacimientoTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(domicilioTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
+                                .addComponent(grupoSanguineoCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(esDonanteCheckbox)
+                                .addComponent(factorSanguineoCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addComponent(jLabel11)
+                    .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel17)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(tipoDNICombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -256,17 +240,8 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel9)
                     .addComponent(esDonanteCheckbox))
-                .addGap(18, 18, 18)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(observacionesTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel14))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(altaBtn)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(5, 5, 5)
+                .addComponent(altaBtn))
         );
 
         pack();
@@ -274,7 +249,7 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
     
 
     private void titularBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titularBtnActionPerformed
-        int retorno = 0;
+
         
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -286,7 +261,7 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
             if (domicilioTextField.getText().equals("")) { throw new CampoVacioException("Domicilio"); }
             if (fechaNacimientoTextField.getText().equals("")) { throw new CampoVacioException("Fecha de Nacimiento"); }
             
-            Titular unTitular = new Titular(tipoDocumentoSeleccionado, nroDNITextField.getText(), apellidosTextField.getText(), nombresTextField.getText(), fechaNacimiento, domicilioTextField.getText(), grupoSanguineoSeleccionado, factorSanguineoSeleccionado, esDonanteSeleccionado, observacionesTextField.getText());
+            Titular unTitular = new Titular(tipoDocumentoSeleccionado, nroDNITextField.getText(), apellidosTextField.getText(), nombresTextField.getText(), fechaNacimiento, domicilioTextField.getText(), grupoSanguineoSeleccionado, factorSanguineoSeleccionado, esDonanteSeleccionado);
             
             // retorno = DAOTitular.insertar(unTitular);
 
@@ -302,7 +277,7 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
             
             if (seleccion == 0)
             {
-                retorno = DAOTitular.insertar(unTitular);
+                int retorno = DAOTitular.insertar(unTitular);
                 
                 if (retorno > 0)
                 {
@@ -434,8 +409,9 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
     private javax.swing.JTextField fechaNacimientoTextField;
     private javax.swing.JComboBox<String> grupoSanguineoCombo;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -444,11 +420,8 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTextField nombresTextField;
     private javax.swing.JTextField nroDNITextField;
-    private javax.swing.JTextField observacionesTextField;
     private javax.swing.JComboBox<String> tipoDNICombo;
     // End of variables declaration//GEN-END:variables
 

@@ -23,7 +23,7 @@ public class pdf {
     public static final String HTML = "src/carnets/PDF.template.html";
 
     public void emitirLicencia(Carnet carnet, Titular titular) throws IOException, DocumentException {
-        String file = System.getProperty("user.home") + "/Desktop/" + carnet.getNumero() + ".pdf";
+        String file = System.getProperty("user.home") + "/Desktop/" + carnet.getNumero().get() + ".pdf";
         
         File fileHandle = new File(file);
         fileHandle.getParentFile().mkdirs();
@@ -38,14 +38,14 @@ public class pdf {
         content = content.replace("{{ emision }}", carnet.getEmision().toString());
         content = content.replace("{{ expiracion }}", carnet.getExpiracion().toString());
 
-        content = content.replace("{{ numero }}", String.valueOf(carnet.getNumero()));
+        content = content.replace("{{ numero }}", String.valueOf(carnet.getNumero().get()));
         content = content.replace("{{ nombres }}", titular.getNombres());
         content = content.replace("{{ apellidos }}", titular.getApellidos());
         content = content.replace("{{ domicilio }}", titular.getDireccion());
         content = content.replace("{{ grupoSanguineo }}", titular.getGrupoSanguineo().nombre);
         content = content.replace("{{ factorSanguineo }}", Character.toString(titular.getFactorSanguineo().signo));
         content = content.replace("{{ donante }}", titular.isDonante()? "Sí" : "No");
-        content = content.replace("{{ observaciones }}", titular.getObservaciones());
+        content = content.replace("{{ observaciones }}", carnet.getObservaciones());
         
         PdfPTable table = new PdfPTable(1);
         PdfPCell cell = new PdfPCell();

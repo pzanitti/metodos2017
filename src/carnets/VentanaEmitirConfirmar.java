@@ -1,5 +1,7 @@
 package carnets;
 
+import java.time.format.DateTimeFormatter;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -11,13 +13,28 @@ package carnets;
  * @author user
  */
 public class VentanaEmitirConfirmar extends javax.swing.JDialog {
-
+    
+    static private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    
+    public boolean confirmado = false;
+    
     /**
      * Creates new form VentanaEmitirConfirmar
      */
-    public VentanaEmitirConfirmar(java.awt.Frame parent, boolean modal) {
+    public VentanaEmitirConfirmar(java.awt.Frame parent, boolean modal, Carnet carnet, int costo) {
         super(parent, modal);
         initComponents();
+        
+        nombreApellidoLabel.setText(carnet.getTitular().getNombres() + ' ' + carnet.getTitular().getApellidos());
+        identificacionLabel.setText(carnet.getTitular().getTipoDocumento().nombre + ' ' + carnet.getTitular().getNumeroDocumento());
+        fechaNacimientoLabel.setText(carnet.getTitular().getFechaNacimiento().format(formatter));
+        domicilioLabel.setText(carnet.getTitular().getDireccion());
+        grupoFactorLabel.setText(carnet.getTitular().getGrupoSanguineo().nombre + carnet.getTitular().getFactorSanguineo().signo);
+        donanteLabel.setText(carnet.getTitular().isDonante() ? "Sí" : "No");
+        
+        claseLabel.setText(String.valueOf(carnet.getClase().letra));
+        expiracionLabel.setText(carnet.getExpiracion().format(formatter));
+        costoLabel.setText("$" + costo);
     }
 
     /**
@@ -49,13 +66,19 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
         identificacionLabel = new javax.swing.JLabel();
         nombreApellidoLabel = new javax.swing.JLabel();
         claseLabel = new javax.swing.JLabel();
-        vigenciaLabel = new javax.swing.JLabel();
+        expiracionLabel = new javax.swing.JLabel();
         costoLabel = new javax.swing.JLabel();
         donanteLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Confirmar emisión");
 
         btnEmitir.setText("Emitir");
+        btnEmitir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEmitirActionPerformed(evt);
+            }
+        });
 
         btnCancelar.setText("Cancelar");
         btnCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -64,7 +87,7 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("Desea emitir la siguiente licencia?");
+        jLabel1.setText("¿Desea emitir la siguiente licencia?");
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel2.setText("Emitir licencia");
@@ -78,13 +101,13 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
         domicilioLabel.setText("jLabel5");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel6.setText("Fecha de Nacimiento:");
+        jLabel6.setText("Fecha de nacimiento:");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel7.setText("Domicilio:");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel8.setText("Grupo y Factor Sanguineo:");
+        jLabel8.setText("Grupo y factor sanguíneo:");
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel9.setText("Donante:");
@@ -93,7 +116,7 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
         jLabel10.setText("Clase:");
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jLabel11.setText("Vigencia:");
+        jLabel11.setText("Fecha de expiración:");
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel12.setText("Costo:");
@@ -108,7 +131,7 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
 
         claseLabel.setText("jLabel17");
 
-        vigenciaLabel.setText("jLabel18");
+        expiracionLabel.setText("jLabel18");
 
         costoLabel.setText("jLabel19");
 
@@ -121,16 +144,16 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(93, 93, 93)
-                        .addComponent(btnCancelar)
-                        .addGap(70, 70, 70)
-                        .addComponent(btnEmitir))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(32, 32, 32)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnCancelar)
                             .addComponent(jLabel2)
-                            .addComponent(jLabel1)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(56, 56, 56)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jSeparator1)
                                 .addGroup(layout.createSequentialGroup()
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addComponent(jLabel8)
@@ -146,24 +169,23 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
                                         .addComponent(identificacionLabel)
                                         .addComponent(fechaNacimientoLabel)
                                         .addComponent(domicilioLabel)
-                                        .addComponent(grupoFactorLabel))
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 72, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 338, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(grupoFactorLabel)))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addComponent(jLabel12)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(costoLabel))
+                                .addGroup(layout.createSequentialGroup()
                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel12)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(costoLabel))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel11)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(vigenciaLabel))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel10)
-                                            .addGap(120, 120, 120)
-                                            .addComponent(claseLabel))))))))
-                .addContainerGap(30, Short.MAX_VALUE))
+                                        .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(expiracionLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(claseLabel, javax.swing.GroupLayout.Alignment.TRAILING))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(154, 154, 154)
+                                .addComponent(btnEmitir)))))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -205,7 +227,7 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
-                    .addComponent(vigenciaLabel))
+                    .addComponent(expiracionLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
@@ -224,47 +246,10 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VentanaEmitirConfirmar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VentanaEmitirConfirmar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VentanaEmitirConfirmar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(VentanaEmitirConfirmar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                VentanaEmitirConfirmar dialog = new VentanaEmitirConfirmar(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+    private void btnEmitirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmitirActionPerformed
+        confirmado = true;
+        dispose();
+    }//GEN-LAST:event_btnEmitirActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
@@ -273,6 +258,7 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
     private javax.swing.JLabel costoLabel;
     private javax.swing.JLabel domicilioLabel;
     private javax.swing.JLabel donanteLabel;
+    private javax.swing.JLabel expiracionLabel;
     private javax.swing.JLabel fechaNacimientoLabel;
     private javax.swing.JLabel grupoFactorLabel;
     private javax.swing.JLabel identificacionLabel;
@@ -289,6 +275,5 @@ public class VentanaEmitirConfirmar extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel nombreApellidoLabel;
-    private javax.swing.JLabel vigenciaLabel;
     // End of variables declaration//GEN-END:variables
 }

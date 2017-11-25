@@ -25,7 +25,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     public VentanaPrincipal() {
         initComponents();
-        DB.init();
+        DB.init(false);
         carnets = new ArrayList<>();
         costos = Costo.init();
     }
@@ -121,6 +121,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jMenu2.add(jMenuItem2);
 
         jMenuItem4.setText("Licencias Vigentes");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMenuItem4);
 
         jMenuBar1.add(jMenu2);
@@ -167,7 +172,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        VentanaLicenciasExpiradas ventanaLicenciasExpiradas = new VentanaLicenciasExpiradas(this, true); 
+        VentanaLicenciasExpiradas ventanaLicenciasExpiradas = new VentanaLicenciasExpiradas(this, true);
         ventanaLicenciasExpiradas.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
@@ -184,6 +189,11 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         VentanaAltaTitular ventanaAlta = new VentanaAltaTitular(this, true);
         ventanaAlta.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        VentanaLicenciasCriterios ventanaLicenciasCriterios = new VentanaLicenciasCriterios(this, true);
+        ventanaLicenciasCriterios.setVisible(true);
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -215,7 +225,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new VentanaPrincipal().setVisible(true);
+                new VentanaPrincipal().setVisible(false);
             }
         });
     }

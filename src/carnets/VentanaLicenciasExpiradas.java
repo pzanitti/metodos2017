@@ -5,24 +5,61 @@
  */
 package carnets;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 
 public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
+    private List<Carnet> carnetsExpirados;
+    
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final VentanaPrincipal ventanaPrincipal = (VentanaPrincipal) this.getParent();
+    
+    private final MyTableModel modeloTabla;
+    private List<Carnet> listaExpirados;
     
     public VentanaLicenciasExpiradas(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+//        JTExpirados.setDefaultRenderer(Object.class, new MyTableCellRenderer());
+        modeloTabla = new MyTableModel(
+            new Object [][] {},
+            new String [] {
+                "Nro de Licencia", "Fecha de Expiración"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        };
+        JTExpirados.setModel(modeloTabla);
+        JTExpirados.setDefaultRenderer(Object.class, new MyTableCellRenderer());
     }
     
     
@@ -49,8 +86,20 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
 
         jLabel1.setText("Desde");
 
+        jTDesde.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTDesdeActionPerformed(evt);
+            }
+        });
+
         jLabel2.setText("Hasta");
         jLabel2.setToolTipText("");
+
+        jTHasta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTHastaActionPerformed(evt);
+            }
+        });
 
         jBtBuscar.setText("Buscar");
         jBtBuscar.addActionListener(new java.awt.event.ActionListener() {
@@ -58,6 +107,8 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
                 jBtBuscarActionPerformed(evt);
             }
         });
+
+        jScrollPane1.setAutoscrolls(true);
 
         JTExpirados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -82,16 +133,29 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
                 "Nro de Licencia", "Fecha de Expiración"
             }
         ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class
+            };
             boolean[] canEdit = new boolean [] {
                 false, false
             };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
         JTExpirados.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        JTExpirados.setPreferredSize(new java.awt.Dimension(372, 240));
+        JTExpirados.setMaximumSize(new java.awt.Dimension(2147483647, 2147483647));
+        JTExpirados.setPreferredSize(new java.awt.Dimension(354, 1000));
+        JTExpirados.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                JTExpiradosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(JTExpirados);
         if (JTExpirados.getColumnModel().getColumnCount() > 0) {
             JTExpirados.getColumnModel().getColumn(0).setResizable(false);
@@ -104,9 +168,7 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE))
+                .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addGap(12, 12, 12)
@@ -120,6 +182,10 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jBtBuscar)
                 .addGap(12, 12, 12))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -133,9 +199,9 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
                     .addComponent(jBtBuscar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12))
+                .addContainerGap())
         );
 
         jTDesde.getAccessibleContext().setAccessibleName("");
@@ -158,36 +224,78 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
             LocalDate desde = LocalDate.parse(jTDesde.getText(), formatter);
             LocalDate hasta = LocalDate.parse(jTHasta.getText(), formatter);
             
-            
             Optional<LocalDate> expiracionDesde = Optional.of(desde);
-            Optional<LocalDate> expiracionHasta = Optional.of(hasta);
 
-            List<Carnet> listaExpirados = DAOCarnet.expirados(expiracionDesde, expiracionHasta);
-            
-            DefaultTableModel model = (DefaultTableModel) JTExpirados.getModel();
+            listaExpirados = DAOCarnet.expirados(expiracionDesde, hasta);
+            System.out.println(listaExpirados.size());
             
             //Borramos todas las filas
-            int rowCount = model.getRowCount();
+            int rowCount = modeloTabla.getRowCount();
             for (int i = rowCount - 1; i >= 0; i--) {
-                model.removeRow(i);
+                modeloTabla.removeRow(i);
             }
             
             //llenamos el modelo con la lista
             listaExpirados.forEach((c) -> {
-                model.addRow(new Object[]{c.getNumero().get(), c.getExpiracion().format(formatter)});
+                modeloTabla.addRow(c);
             });
             
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage());
+            System.out.println(modeloTabla.getRowCount());
+            
         } catch (CampoVacioException e) {
             JOptionPane.showMessageDialog(null, e.getMessage() + " no puede estar vacío.");
         } catch (DateTimeParseException e) {
             JOptionPane.showMessageDialog(null, "Una o ambas fechas no son válidas. Deben estar en formato dd/mm/yyyy.");
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage());
-        }
+        } catch (SQLException ex) {
+            Logger.getLogger(VentanaLicenciasExpiradas.class.getName()).log(Level.SEVERE, null, ex);
+        }                        
     }//GEN-LAST:event_jBtBuscarActionPerformed
+        
+    private void JTExpiradosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTExpiradosMouseClicked
+        
+        if (evt.getClickCount() == 2){
+            int fila = JTExpirados.getSelectedRow();
+            Carnet c = listaExpirados.get(fila);
 
+            System.out.println(fila + " --> Nro: " + c.getNumero().toString() + " Fecha: " + c.getExpiracion().format(formatter));
+                    
+            String nro = modeloTabla.getValueAt(fila, 0).toString();
+            String fecha = modeloTabla.getValueAt(fila, 1).toString();
+
+            if (!nro.equals("") && !fecha.equals("")) {
+                System.out.println(fila + " --> Nro: " + nro + " Fecha: " + fecha);
+            }
+        }
+    }//GEN-LAST:event_JTExpiradosMouseClicked
+
+    private void jTDesdeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTDesdeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTDesdeActionPerformed
+
+    private void jTHastaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTHastaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTHastaActionPerformed
+    
+//    private void limpiarTabla(){
+//        int i = 0;
+//        int filas = tabla.getRowCount();
+//        
+//        for (i = 1; i <= filas; i++){
+//            tabla.removeRow(0);
+//        }
+//    }
+//    
+//    private void rellenarTabla(){
+//        int i = 0;
+//        int filas = tabla.getRowCount();
+//        
+//        if (filas < 16){
+//            for (i = filas; i <= 16; i++){
+//                tabla.addRow(new Object[] {"", ""});
+//            }
+//        }
+//    }
+    
     /**
      * @param args the command line arguments
      */
@@ -244,6 +352,38 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
     private static class CampoVacioException extends Exception {
         public CampoVacioException(String campo) {
             super(campo);
+        }
+    }
+    
+    private class MyTableModel extends DefaultTableModel {
+        
+        public MyTableModel(Object[][] data, Object[] columnNames) {
+            super.setDataVector(data, columnNames);
+        }
+
+        List<Color> rowColours = new ArrayList<>();
+        
+        public void addRow(Carnet c) {
+            addRow(new Object[]{c.getNumero().get(), c.getExpiracion().format(formatter)});
+            Color color = (c.isExpirado()) ? Color.RED : Color.GREEN;
+            int row = getRowCount();
+            rowColours.add(color);
+            fireTableRowsUpdated(row, row);
+        }
+
+        public Color getRowColour(int row) {
+            return rowColours.get(row);
+        }
+    }
+    
+    public class MyTableCellRenderer extends DefaultTableCellRenderer {
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            MyTableModel model = (MyTableModel) table.getModel();
+            Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            c.setBackground(model.getRowColour(row));
+            return c;
         }
     }
 }

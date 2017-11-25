@@ -18,8 +18,8 @@ public class DAOCarnet {
     public static Carnet insertar(Carnet carnet) {
         Objects.requireNonNull(carnet);
         
-        String sql = "INSERT INTO carnets VALUES\n"
-                + "(null, ?,?,?,?,?)";
+        String sql = "INSERT INTO carnets(clase, emision, expiracion, observaciones, tipoDocumento, numeroDocumento)\n"
+                + "VALUES(?, ?, ?, ?, ?, ?)";
         
         try {
             Connection conn = DB.conectar();
@@ -27,8 +27,9 @@ public class DAOCarnet {
             pstmt.setString(1, Character.toString(carnet.getClase().letra));
             pstmt.setString(2, carnet.getEmision().toString());
             pstmt.setString(3, carnet.getExpiracion().toString());
-            pstmt.setString(4, carnet.getTitular().getTipoDocumento().nombre);
-            pstmt.setString(5, carnet.getTitular().getNumeroDocumento());
+            pstmt.setString(4, carnet.getObservaciones());
+            pstmt.setString(5, carnet.getTitular().getTipoDocumento().nombre);
+            pstmt.setString(6, carnet.getTitular().getNumeroDocumento());
             pstmt.executeUpdate();
             
             int numero;
@@ -41,12 +42,12 @@ public class DAOCarnet {
             
             DAOAuditoria.insertar("Emitida licencia " + numero + " a " + carnet.getTitular().getTipoDocumento().nombre + " " + carnet.getTitular().getNumeroDocumento());
             
-            return new Carnet(numero, carnet.getClase(), carnet.getEmision(), carnet.getExpiracion(), carnet.getTitular());
+            return new Carnet(numero, carnet.getClase(), carnet.getEmision(), carnet.getExpiracion(), carnet.getObservaciones(), carnet.getTitular());
         
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        assert(false);
+        assert false;
         return null;
     };
     
@@ -56,7 +57,8 @@ public class DAOCarnet {
         List<Carnet> carnets = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         
-        String sql = "SELECT * FROM carnets WHERE\n"
+        String sql = "SELECT numero, clase, emision, expiracion, observaciones\n" 
+               + "FROM carnets WHERE\n"
                + "tipoDocumento = ? AND\n"
                + "numeroDocumento = ?";
         
@@ -75,6 +77,7 @@ public class DAOCarnet {
                         Clase.fromLetra(rs.getString("clase").charAt(0)),
                         LocalDate.parse(rs.getString("emision"), formatter),
                         LocalDate.parse(rs.getString("expiracion"), formatter),
+                        rs.getString("observaciones"),
                         unTitular
                 );
                 
@@ -87,16 +90,18 @@ public class DAOCarnet {
         return carnets;
     }
     
-    public static List<Carnet> expirados(Optional<LocalDate> expiracionDesde, Optional<LocalDate> expiracionHasta) throws SQLException
+    public static List<Carnet> expirados(Optional<LocalDate> expiracionDesde, LocalDate expiracionHasta) throws SQLException
     {
         Objects.requireNonNull(expiracionDesde);
         Objects.requireNonNull(expiracionHasta);
-        if(expiracionHasta.isPresent() && !expiracionHasta.get().isBefore(LocalDate.now())) throw new IllegalArgumentException("expiracionHasta debe ser anterior a la fecha actual");
+        if(expiracionDesde.isPresent() && expiracionHasta.isBefore(expiracionDesde.get())) throw new IllegalArgumentException("expiracionHasta no puede ser anterior a la expiracionDesde");
         
-        String sql = "SELECT * FROM carnets WHERE expiracion < ?\n";//" +  +  "\"\n";
+        String sql = "SELECT numero, clase, emision, expiracion, observaciones, tipoDocumento, numeroDocumento\n"
+                + "FROM carnets\n"
+                + "WHERE expiracion <= ?\n";
         
         if(expiracionDesde.isPresent()) {
-            sql += "AND expiracion > ?\n";
+            sql += "AND expiracion >= ?\n";
         }
         
         sql += "ORDER BY expiracion ASC";
@@ -104,7 +109,7 @@ public class DAOCarnet {
         try {
             Connection conn = DB.conectar();
             PreparedStatement pstmt  = conn.prepareStatement(sql);
-            pstmt.setString(1, expiracionHasta.orElse(LocalDate.now()).toString());
+            pstmt.setString(1, expiracionHasta.toString());
             if(expiracionDesde.isPresent()) pstmt.setString(2, expiracionDesde.get().toString());
             ResultSet rs    = pstmt.executeQuery();
             
@@ -119,10 +124,9 @@ public class DAOCarnet {
                         Clase.fromLetra(rs.getString("clase").charAt(0)),
                         LocalDate.parse(rs.getString("emision"), formatter),
                         LocalDate.parse(rs.getString("expiracion"), formatter),
+                        rs.getString("observaciones"),
                         DAOTitular.obtener(TipoDocumento.fromNombre(rs.getString("tipoDocumento")), rs.getString("numeroDocumento")).get()
                 );
-                
-                assert(carnet.isExpirado());
                 
                 ret.add(carnet);
                 
@@ -145,22 +149,8 @@ public class DAOCarnet {
                                     .filter(c -> !c.isExpirado())
                                     .collect(Collectors.toList());
         
-        assert(ret.stream().allMatch(c -> !c.isExpirado() && criterios.coinciden(c.getTitular())));
+        assert ret.stream().allMatch(c -> !c.isExpirado() && criterios.coinciden(c.getTitular()));
         
         return ret;
     }
-    
-    
-    /*
-    -- SELECT *
-    -- FROM `carnets` `C`
-    --  INNER JOIN `titular` `T` ON (`C`.`tipoDocumento` = `T`.`tipoDocumento` AND `C`.`numeroDocumento` = `T`.`numeroDocumento`)
-
-    SELECT `C`.`numero`, `C`.`clase`, `C`.`emision`, `C`.`expiracion`, `T`.`apellidos`, `T`.`nombres`, `C`.`tipoDocumento`, `C`.`numeroDocumento`
-    FROM `carnets` `C`
-      INNER JOIN `titular` `T` ON (`C`.`tipoDocumento` = `T`.`tipoDocumento` AND `C`.`numeroDocumento` = `T`.`numeroDocumento`)
-    WHERE CAST(substr(`C`.`expiracion`,1,4) as INTEGER) <= 2019 -- Año
-      AND CAST(substr(`C`.`expiracion`,6,2) as INTEGER) <= 1 -- Mes
-      AND CAST(substr(`C`.`expiracion`,9,2) as INTEGER) <= 11 -- Dia
-    */
 }
