@@ -318,12 +318,11 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
         
         try {
             pdf unPdf = new pdf();
-            unPdf.imprimirListaCarnets(carnetsVigentes, "Listado de Licencias Expiradas");
-        } catch (IOException ex) {
+            unPdf.imprimirListaCarnets(carnetsVigentes, "Listado de Licencias Vigentes");
+        } catch (IOException | DocumentException ex) {
             Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (DocumentException ex) {
-            Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            JOptionPane.showMessageDialog(null, "Error de escritura al generar el PDF.");
+        } 
     }//GEN-LAST:event_jBImprimirActionPerformed
 
     private void jCGSanguineoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCGSanguineoActionPerformed
