@@ -5,12 +5,27 @@
  */
 package carnets;
 
+import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JComboBox;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author Gabriel
  */
 public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
+    private FactorSanguineo factorSanguineoSeleccionado;
+    private GrupoSanguineo grupoSanguineoSeleccionado;
+    final public GrupoSanguineo[] grupoSanguineos = GrupoSanguineo.values();
+    final public FactorSanguineo[] factorSanguineos = FactorSanguineo.values();
 
+    private List<Carnet> carnetsVigentes;
+    
     /**
      * Creates new form VentanaVigentesPorCriterios
      */
@@ -46,7 +61,8 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JSeparator();
         jBImprimir = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Buscar licencias vigentes");
 
         jLabel1.setText("Apellidos:");
 
@@ -54,15 +70,30 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
 
         jLabel3.setText("Grupo sanguíneo:");
 
-        jCGSanguineo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "A", "B", "AB", "O" }));
+        jCGSanguineo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "A", "B", "AB", "O" }));
+        jCGSanguineo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCGSanguineoActionPerformed(evt);
+            }
+        });
 
         jLFSanguineo.setText("Factor sanguíneo");
 
-        jCFSanguineo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "", "+", "-" }));
+        jCFSanguineo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "+", "-" }));
+        jCFSanguineo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCFSanguineoActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Donante");
 
-        jCBDonante.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Sí", "No" }));
+        jCBDonante.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { " ", "Sí", "No" }));
+        jCBDonante.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCBDonanteActionPerformed(evt);
+            }
+        });
 
         jBBuscar.setText("Buscar");
         jBBuscar.addActionListener(new java.awt.event.ActionListener() {
@@ -79,22 +110,7 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
 
         JTCriterios.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+
             },
             new String [] {
                 "Número de licencia", "Fecha de expiración"
@@ -116,7 +132,8 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
             }
         });
         JTCriterios.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        JTCriterios.setPreferredSize(new java.awt.Dimension(372, 240));
+        JTCriterios.setMaximumSize(new java.awt.Dimension(2147483647, 2147483647));
+        JTCriterios.setPreferredSize(new java.awt.Dimension(357, 1000));
         JTCriterios.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 JTCriteriosMouseClicked(evt);
@@ -231,26 +248,98 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jBBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBBuscarActionPerformed
-        // TODO add your handling code here:
+        
+        try {
+            Optional<String> apellidos = Optional.ofNullable(jTApellidos.getText()).filter(s -> !s.isEmpty());
+            Optional<String> nombres = Optional.ofNullable(jTNombres.getText()).filter(s -> !s.isEmpty());
+            Boolean esDonante = null;
+            
+            if(!jCBDonante.getSelectedItem().equals(" ")) {
+                esDonante = jCBDonante.getSelectedItem().equals("Sí");
+            }
+            
+            System.out.println("apellidos '" + apellidos + "'");
+            System.out.println("nombres '" + nombres + "'");
+            System.out.println("grupoSanguineoSeleccionado '" + Optional.ofNullable(grupoSanguineoSeleccionado) + "'");
+            System.out.println("factorSanguineoSeleccionado '" + Optional.ofNullable(factorSanguineoSeleccionado) + "'");
+            System.out.println("nombres '" + Optional.ofNullable(esDonante) + "'");
+            
+            Criterios criterios = new Criterios(
+                    apellidos,
+                    nombres,
+                    Optional.ofNullable(grupoSanguineoSeleccionado),
+                    Optional.ofNullable(factorSanguineoSeleccionado),
+                    Optional.ofNullable(esDonante)
+            );
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            
+            carnetsVigentes = DAOCarnet.vigentesPorCriterios(criterios);
+            
+            //Borramos todas las filas
+            DefaultTableModel model = (DefaultTableModel) JTCriterios.getModel();
+            int rowCount = model.getRowCount();
+            for (int i = rowCount - 1; i >= 0; i--) {
+                model.removeRow(i);
+            }
+            
+            //llenamos el modelo con la lista
+            carnetsVigentes.forEach((c) -> {
+                model.addRow(new Object[]{c.getNumero().get(), c.getExpiracion().format(formatter)});
+            });
+        } catch (SQLException ex) {
+            Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jBBuscarActionPerformed
 
     private void JTCriteriosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JTCriteriosMouseClicked
 
         if (evt.getClickCount() == 2){
             int fila = JTCriterios.getSelectedRow();
-
-//            String nro = tabla.getValueAt(fila, 0).toString();
-//            String fecha = tabla.getValueAt(fila, 1).toString();
-
-//            if (!nro.equals("") && !fecha.equals("")) {
-//                System.out.println(fila + " --> Nro: " + nro + " Fecha: " + fecha);
-//s            }
+            
+            Carnet c = carnetsVigentes.get(fila);
+            
+            VentanaDetallesCarnet ventanaDetallesCarnet = new VentanaDetallesCarnet(null, true, c, 0);
+            ventanaDetallesCarnet.setVisible(true);
         }
     }//GEN-LAST:event_JTCriteriosMouseClicked
 
     private void jBImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImprimirActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jBImprimirActionPerformed
+
+    private void jCGSanguineoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCGSanguineoActionPerformed
+        JComboBox cb = (JComboBox)evt.getSource();
+        String nombreGrupoSanguineo = (String)cb.getSelectedItem();
+        
+        grupoSanguineoSeleccionado = null;
+        for (GrupoSanguineo unGrupoSanguineo: grupoSanguineos) {
+            if (unGrupoSanguineo.nombre.equals(nombreGrupoSanguineo)) {
+                grupoSanguineoSeleccionado = unGrupoSanguineo;
+                break;
+            }
+        }
+    }//GEN-LAST:event_jCGSanguineoActionPerformed
+
+    private void jCFSanguineoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCFSanguineoActionPerformed
+        factorSanguineoSeleccionado = null;
+        
+        JComboBox cb = (JComboBox)evt.getSource();
+        String cad = cb.getSelectedItem().toString().replaceAll("\\s+","");
+        char nombreFactorSanguineo = (cad.isEmpty()) ? ' ' : cad.charAt(0);
+        
+        
+        for (FactorSanguineo unFactorSanguineo: factorSanguineos) {
+            if (unFactorSanguineo.signo == nombreFactorSanguineo) {
+                factorSanguineoSeleccionado = unFactorSanguineo;
+                break;
+            }
+        }
+    }//GEN-LAST:event_jCFSanguineoActionPerformed
+
+    private void jCBDonanteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCBDonanteActionPerformed
+        
+    }//GEN-LAST:event_jCBDonanteActionPerformed
 
     /**
      * @param args the command line arguments
