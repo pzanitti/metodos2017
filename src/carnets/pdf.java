@@ -18,9 +18,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class pdf {
     public static final String HTML = "src/carnets/PDF.template.html";
+    public static final String BASE_LISTA_HTML = "src/carnets/baseListaPDF.template.html";
+    public static final String CARNET_HTML = "src/carnets/carnetPDF.template.html";
 
     public void emitirLicencia(Carnet carnet, Titular titular) throws IOException, DocumentException {
         String file = System.getProperty("user.home") + "/Desktop/" + carnet.getNumero().get() + ".pdf";
@@ -50,6 +54,51 @@ public class pdf {
         PdfPTable table = new PdfPTable(1);
         PdfPCell cell = new PdfPCell();
         ElementList list = XMLWorkerHelper.parseToElementList(content, null);
+        
+        for (Element element : list) {
+            cell.addElement(element);
+        }
+        table.addCell(cell);
+        document.add(table);
+
+        document.close();
+        
+        Desktop.getDesktop().open(fileHandle);
+    }
+    
+    public void imprimirListaCarnets(List<Carnet> listaCarnets, String titulo) throws IOException, DocumentException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        
+        String contenido = readFile(BASE_LISTA_HTML, StandardCharsets.UTF_8);
+        contenido = contenido.replace("{{ titulo }}", titulo);
+        
+        //Completamos la lista
+        String contenidoLista = "";
+        String carnetTemplateString = readFile(CARNET_HTML, StandardCharsets.UTF_8);
+        for(Carnet c : listaCarnets) {
+            String temp = carnetTemplateString;
+            
+            temp = temp.replace("{{ numero }}", c.getNumero().get().toString());
+            temp = temp.replace("{{ expiracion }}", c.getExpiracion().format(formatter));
+            
+            contenidoLista += temp;
+        }
+        
+        contenido = contenido.replace("{{ cuerpo_tabla }}", contenidoLista);
+        
+        
+        String file = System.getProperty("user.home") + "/Desktop/ListadoLicenciasExpiradas.pdf";
+        
+        File fileHandle = new File(file);
+        fileHandle.getParentFile().mkdirs();
+
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(file));
+        document.open();
+        
+        PdfPTable table = new PdfPTable(1);
+        PdfPCell cell = new PdfPCell();
+        ElementList list = XMLWorkerHelper.parseToElementList(contenido, null);
         
         for (Element element : list) {
             cell.addElement(element);

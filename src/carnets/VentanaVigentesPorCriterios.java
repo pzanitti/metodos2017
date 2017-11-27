@@ -5,13 +5,17 @@
  */
 package carnets;
 
+import com.itextpdf.text.DocumentException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -31,6 +35,8 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
      */
     public VentanaVigentesPorCriterios() {
         initComponents();
+        
+        carnetsVigentes = new ArrayList<>();
     }
 
     /**
@@ -305,7 +311,19 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
     }//GEN-LAST:event_JTCriteriosMouseClicked
 
     private void jBImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImprimirActionPerformed
-        // TODO add your handling code here:
+        if(carnetsVigentes.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No hay elementos en la lista para imprimir.");
+            return;
+        }
+        
+        try {
+            pdf unPdf = new pdf();
+            unPdf.imprimirListaCarnets(carnetsVigentes, "Listado de Licencias Expiradas");
+        } catch (IOException ex) {
+            Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DocumentException ex) {
+            Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jBImprimirActionPerformed
 
     private void jCGSanguineoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCGSanguineoActionPerformed

@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <style>
+            .header {
+                text-align: center;
+                border: 1px solid black;
+                line-height: 1em;
+                background-color: lightblue;
+            }
+            
+            h1 {
+                font-size: 1em;
+            }
+            
+            h2 {
+                font-size: 0.8em;
+            }
+            
+            td {
+                vertical-align: top;
+            }
+            
+            body {
+                width: 700px;
+            }
+            
+            table, th, td {
+                border-collapse: collapse;
+            }
+            
+            th {
+                font-weight: bold;
+                text-align: center;
+                width: 273px;
+            }
+            
+            td {
+                text-align: center;
+                width: 273px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1><b>{{ titulo }}</b></h1>
+            <h2><b>Municipalidad de Prueba</b></h2>
+        </div>
+        <br />
+        <table>
+            <thead>
+                <tr>
+                    <th>Número de Licencia</th>
+                    <th>Fecha de Expiración</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ cuerpo_tabla }}
+            </tbody>
+        </table>
+        <hr/>
+    </body>
+</html>
