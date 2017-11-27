@@ -120,7 +120,7 @@ public class DB {
                 + "'Direccion', "
                 + "'B', "
                 + "'+', "
-                + "'NO');";
+                + "0);";
         stmt.execute(sql);  
         sql = "INSERT INTO titulares(tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante) VALUES\n"
                 + "('DNI', "
@@ -131,7 +131,7 @@ public class DB {
                 + "'Direccion', "
                 + "'A', "
                 + "'+', "
-                + "'NO');";
+                + "0);";
         stmt.execute(sql);
         sql = "INSERT INTO titulares(tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante) VALUES\n"        
                 + "('DNI', "
@@ -142,7 +142,7 @@ public class DB {
                 + "'Direccion', "
                 + "'O', "
                 + "'-', "
-                + "'SI');";
+                + "1);";
         stmt.execute(sql);
         sql = "INSERT INTO titulares(tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante) VALUES\n"        
                 + "('DNI', "
@@ -153,7 +153,7 @@ public class DB {
                 + "'Direccion', "
                 + "'O', "
                 + "'+', "
-                + "'NO');";
+                + "0);";
         stmt.execute(sql);
     }
 }

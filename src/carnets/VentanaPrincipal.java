@@ -191,8 +191,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        VentanaLicenciasCriterios ventanaLicenciasCriterios = new VentanaLicenciasCriterios(this, true);
-        ventanaLicenciasCriterios.setVisible(true);
+        VentanaVigentesPorCriterios ventanaVigentesPorCriterios = new VentanaVigentesPorCriterios();
+        ventanaVigentesPorCriterios.setVisible(true);
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     /**

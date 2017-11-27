@@ -24,8 +24,6 @@ import javax.swing.table.DefaultTableModel;
 
 
 public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
-    private List<Carnet> carnetsExpirados;
-    
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final VentanaPrincipal ventanaPrincipal = (VentanaPrincipal) this.getParent();
     
@@ -227,7 +225,6 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
             Optional<LocalDate> expiracionDesde = Optional.of(desde);
 
             listaExpirados = DAOCarnet.expirados(expiracionDesde, hasta);
-            System.out.println(listaExpirados.size());
             
             //Borramos todas las filas
             int rowCount = modeloTabla.getRowCount();
@@ -239,8 +236,6 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
             listaExpirados.forEach((c) -> {
                 modeloTabla.addRow(c);
             });
-            
-            System.out.println(modeloTabla.getRowCount());
             
         } catch (CampoVacioException e) {
             JOptionPane.showMessageDialog(null, e.getMessage() + " no puede estar vacío.");

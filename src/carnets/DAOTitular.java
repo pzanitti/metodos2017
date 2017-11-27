@@ -93,12 +93,12 @@ public class DAOTitular {
         String sql = "SELECT tipoDocumento, numeroDocumento, apellidos, nombres, fechaNacimiento, direccion, grupoSanguineo, factorSanguineo, esDonante\n"
                 + "FROM titulares\n"
                 + "WHERE 1=1\n";
-        
+
         if(criterios.apellidos.isPresent()) sql += "AND apellidos = ?\n";
         if(criterios.nombres.isPresent()) sql += "AND nombres = ?\n";
         if(criterios.grupoSanguineo.isPresent()) sql += "AND grupoSanguineo = ?\n";
         if(criterios.factorSanguineo.isPresent()) sql += "AND factorSanguineo = ?\n";
-        if(criterios.donante.isPresent()) sql += "AND donante = ?\n";  
+        if(criterios.donante.isPresent()) sql += "AND esDonante = ?\n";  
                 
         try {
             Connection conn = DB.conectar();
@@ -115,7 +115,6 @@ public class DAOTitular {
             List<Titular> ret = new ArrayList<>();
 
             while (rs.next()) {
-
                 Titular titular = new Titular(
                         TipoDocumento.fromNombre(rs.getString("tipoDocumento")),
                         rs.getString("numeroDocumento"),
