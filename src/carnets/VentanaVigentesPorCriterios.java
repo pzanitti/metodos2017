@@ -318,7 +318,7 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
         
         try {
             pdf unPdf = new pdf();
-            unPdf.imprimirListaCarnets(carnetsVigentes, "Listado de Licencias Vigentes");
+            unPdf.imprimirListaCarnets(carnetsVigentes, "Listado de Licencias Vigentes", false);
         } catch (IOException | DocumentException ex) {
             Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(null, "Error de escritura al generar el PDF.");

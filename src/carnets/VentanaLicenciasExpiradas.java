@@ -298,7 +298,7 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         
         try {
             pdf unPdf = new pdf();
-            unPdf.imprimirListaCarnets(listaExpirados, "Listado de Licencias Expiradas");
+            unPdf.imprimirListaCarnets(listaExpirados, "Listado de Licencias Expiradas", true);
         } catch (IOException | DocumentException ex) {
             Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(null, "Error de escritura al generar el PDF.");

@@ -9,6 +9,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.tool.xml.ElementList;
 import com.itextpdf.tool.xml.XMLWorkerHelper;
+import java.awt.Color;
 import java.awt.Desktop;
  
 import java.io.File;
@@ -66,7 +67,7 @@ public class pdf {
         Desktop.getDesktop().open(fileHandle);
     }
     
-    public void imprimirListaCarnets(List<Carnet> listaCarnets, String titulo) throws IOException, DocumentException {
+    public void imprimirListaCarnets(List<Carnet> listaCarnets, String titulo, Boolean pintarExpirados) throws IOException, DocumentException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         
         String contenido = readFile(BASE_LISTA_HTML, StandardCharsets.UTF_8);
@@ -78,8 +79,16 @@ public class pdf {
         for(Carnet c : listaCarnets) {
             String temp = carnetTemplateString;
             
+            Color color = Color.BLACK;
+            if(pintarExpirados && c.isExpirado()) {
+                color = Color.RED;
+            }
+            
             temp = temp.replace("{{ numero }}", c.getNumero().get().toString());
+            temp = temp.replace("{{ nombre }}", c.getTitular().getNombres());
+            temp = temp.replace("{{ apellido }}", c.getTitular().getApellidos());
             temp = temp.replace("{{ expiracion }}", c.getExpiracion().format(formatter));
+            temp = temp.replace("{{ color }}", "rgb("+color.getRed()+","+color.getGreen()+","+color.getBlue()+")");
             
             contenidoLista += temp;
         }
@@ -87,7 +96,7 @@ public class pdf {
         contenido = contenido.replace("{{ cuerpo_tabla }}", contenidoLista);
         
         
-        String file = System.getProperty("user.home") + "/Desktop/ListadoLicenciasExpiradas.pdf";
+        String file = System.getProperty("user.home") + "/Desktop/" + titulo + ".pdf";
         
         File fileHandle = new File(file);
         fileHandle.getParentFile().mkdirs();
