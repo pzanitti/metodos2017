@@ -263,13 +263,7 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
             if(!jCBDonante.getSelectedItem().equals(" ")) {
                 esDonante = jCBDonante.getSelectedItem().equals("Sí");
             }
-            
-            System.out.println("apellidos '" + apellidos + "'");
-            System.out.println("nombres '" + nombres + "'");
-            System.out.println("grupoSanguineoSeleccionado '" + Optional.ofNullable(grupoSanguineoSeleccionado) + "'");
-            System.out.println("factorSanguineoSeleccionado '" + Optional.ofNullable(factorSanguineoSeleccionado) + "'");
-            System.out.println("nombres '" + Optional.ofNullable(esDonante) + "'");
-            
+
             Criterios criterios = new Criterios(
                     apellidos,
                     nombres,

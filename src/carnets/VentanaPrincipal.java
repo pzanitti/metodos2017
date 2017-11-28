@@ -59,7 +59,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Municipalidad de Prueba");
+        jLabel1.setText("Municipalidad de Santa Fe");
 
         jLabel2.setText("Sistema de Licencias de Conducir");
 

@@ -32,7 +32,7 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
     private final MyTableModel modeloTabla;
     private List<Carnet> listaExpirados;
     
-    public VentanaLicenciasExpiradas(java.awt.Frame parent, boolean modal) {
+    public VentanaLicenciasExpiradas(java.awt.Frame parent, boolean modal)  {
         super(parent, modal);
         initComponents();
         
@@ -62,6 +62,14 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         JTExpirados.setDefaultRenderer(Object.class, new MyTableCellRenderer());
         
         listaExpirados = new ArrayList<>();
+        
+        jTHasta.setText(formatter.format(LocalDate.now()));
+        
+        try {
+            completarTabla();
+        } catch (SQLException ex) {
+            Logger.getLogger(VentanaLicenciasExpiradas.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     
@@ -235,32 +243,11 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
 
     private void jBtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtBuscarActionPerformed
         try {
-            if (jTDesde.getText().equals("")) {
-                throw new CampoVacioException("DESDE");
-            }
             if (jTHasta.getText().equals("")) {
                 throw new CampoVacioException("HASTA");
             }
             
-            DateTimeFormatter formatter =
-                              DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate desde = LocalDate.parse(jTDesde.getText(), formatter);
-            LocalDate hasta = LocalDate.parse(jTHasta.getText(), formatter);
-            
-            Optional<LocalDate> expiracionDesde = Optional.of(desde);
-
-            listaExpirados = DAOCarnet.expirados(expiracionDesde, hasta);
-            
-            //Borramos todas las filas
-            int rowCount = modeloTabla.getRowCount();
-            for (int i = rowCount - 1; i >= 0; i--) {
-                modeloTabla.removeRow(i);
-            }
-            
-            //llenamos el modelo con la lista
-            listaExpirados.forEach((c) -> {
-                modeloTabla.addRow(c);
-            });
+            completarTabla();
             
         } catch (CampoVacioException e) {
             JOptionPane.showMessageDialog(null, e.getMessage() + " no puede estar vacío.");
@@ -360,6 +347,26 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
     private javax.swing.JTextField jTHasta;
     // End of variables declaration//GEN-END:variables
     
+    private void completarTabla() throws SQLException {
+        LocalDate desde = jTDesde.getText().isEmpty() ? null : LocalDate.parse(jTDesde.getText(), formatter);
+        LocalDate hasta = LocalDate.parse(jTHasta.getText(), formatter);
+
+        Optional<LocalDate> expiracionDesde = Optional.ofNullable(desde);
+
+        listaExpirados = DAOCarnet.expirados(expiracionDesde, hasta);
+
+        //Borramos todas las filas
+        int rowCount = modeloTabla.getRowCount();
+        for (int i = rowCount - 1; i >= 0; i--) {
+            modeloTabla.removeRow(i);
+        }
+
+        //llenamos el modelo con la lista
+        listaExpirados.forEach((c) -> {
+            modeloTabla.addRow(c);
+        });
+    }
+    
     private static class CampoVacioException extends Exception {
         public CampoVacioException(String campo) {
             super(campo);
@@ -377,9 +384,16 @@ public class VentanaLicenciasExpiradas extends javax.swing.JDialog {
         public void addRow(Carnet c) {
             addRow(new Object[]{c.getNumero().get(), c.getExpiracion().format(formatter)});
             Color color = (c.isExpirado()) ? Color.RED : Color.GREEN;
+            
             int row = getRowCount();
             rowColours.add(color);
             fireTableRowsUpdated(row, row);
+        }
+        
+        @Override
+        public void removeRow(int row) {
+            rowColours.remove(row);
+            super.removeRow(row);
         }
 
         public Color getRowColour(int row) {

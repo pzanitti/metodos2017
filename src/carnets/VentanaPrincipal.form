@@ -163,7 +163,7 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Municipalidad de Prueba"/>
+            <Property name="text" type="java.lang.String" value="Municipalidad de Santa Fe"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
