@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Desktop;
  
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -26,6 +27,7 @@ public class pdf {
     public static final String HTML = "src/carnets/PDF.template.html";
     public static final String BASE_LISTA_HTML = "src/carnets/baseListaPDF.template.html";
     public static final String CARNET_HTML = "src/carnets/carnetPDF.template.html";
+    public static final String COSTO_CARNET_HTML = "src/carnets/costoCarnetPDF.template.html";
 
     public void emitirLicencia(Carnet carnet, Titular titular) throws IOException, DocumentException {
         String file = System.getProperty("user.home") + "/Desktop/" + carnet.getNumero().get() + ".pdf";
@@ -66,6 +68,44 @@ public class pdf {
         
         Desktop.getDesktop().open(fileHandle);
     }
+    
+    
+    public void imprimirComprobante(Carnet carnet, Titular titular, int costo) throws FileNotFoundException, IOException, DocumentException {
+        String file = System.getProperty("user.home") + "/Desktop/Costo " + carnet.getNumero().get() + ".pdf";
+        System.out.println("imprimirComprobante" + file);
+        File fileHandle = new File(file);
+        fileHandle.getParentFile().mkdirs();
+
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(file));
+        document.open();
+
+        String content = readFile(COSTO_CARNET_HTML, StandardCharsets.UTF_8);
+        content = content.replace("{{ clase }}", Character.toString(carnet.getClase().letra));
+        content = content.replace("{{ emision }}", carnet.getEmision().toString());
+
+        content = content.replace("{{ nombres }}", titular.getNombres());
+        content = content.replace("{{ apellidos }}", titular.getApellidos());
+        content = content.replace("{{ domicilio }}", titular.getDireccion());
+        content = content.replace("{{ costo }}", String.valueOf(costo));
+        
+        System.out.println(content);
+        
+        PdfPTable table = new PdfPTable(1);
+        PdfPCell cell = new PdfPCell();
+        ElementList list = XMLWorkerHelper.parseToElementList(content, null);
+        
+        for (Element element : list) {
+            cell.addElement(element);
+        }
+        table.addCell(cell);
+        document.add(table);
+
+        document.close();
+        
+        Desktop.getDesktop().open(fileHandle);
+    }
+    
     
     public void imprimirListaCarnets(List<Carnet> listaCarnets, String titulo, Boolean pintarExpirados) throws IOException, DocumentException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");

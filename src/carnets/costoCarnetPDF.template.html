@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <style>
+            .header {
+                text-align: center;
+                border: 1px solid black;
+                line-height: 1em;
+                background-color: lightblue;
+            }
+            
+            h1 {
+                font-size: 1em;
+            }
+            
+            h2 {
+                font-size: 0.8em;
+            }
+            
+            table {
+                width: 546px;
+            }
+            
+            tr {
+                width: 700px;
+            }
+            
+            th {
+                font-weight: bold;
+            }
+            
+            td {
+                vertical-align: top;
+            }
+            
+            
+            body {
+                width: 700px;
+            }
+            
+            .align-right {
+                text-align: right;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1><b>Licencia de Conducir</b></h1>
+            <h2><b>Municipalidad de Santa Fe</b></h2>
+        </div>
+        <br />
+        <table>
+            <tr>
+                <td class="align-right">
+                    Fecha de emisón: {{ emision }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Apelldos: {{ apellidos }}<br/>
+                    Nombres: {{ nombres }}<br/>
+                    Domicilio: {{ domicilio }}<br/><br/>
+                </td> 
+            </tr>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th class="align-right">Costo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Licencia (clase {{ clase }})</td>
+                    <td class="align-right">${{ costo }}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="align-right"><strong>Total: ${{ costo }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <hr/>
+    </body>
+</html>

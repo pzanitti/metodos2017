@@ -402,6 +402,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
                 
                 pdf unPdf = new pdf();
                 unPdf.emitirLicencia(unCarnet, titularEncontrado.get());
+                unPdf.imprimirComprobante(unCarnet, titularEncontrado.get(), costo.get());
                 
                 dispose();
             }
