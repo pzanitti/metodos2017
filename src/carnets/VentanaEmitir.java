@@ -193,7 +193,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
 
         observacionesTextField.setEnabled(false);
 
-        emitirBtn.setText("Emitir");
+        emitirBtn.setText("Emitir...");
         emitirBtn.setEnabled(false);
         emitirBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -285,7 +285,7 @@ public class VentanaEmitir extends javax.swing.JDialog {
                                             .addComponent(grupoSanguineoCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                             .addComponent(esDonanteCheckbox)
                                             .addComponent(factorSanguineoCombo, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                                .addGap(0, 15, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel14)

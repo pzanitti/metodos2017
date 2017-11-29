@@ -37,6 +37,12 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
         initComponents();
         
         carnetsVigentes = new ArrayList<>();
+        
+        try {
+            completarTabla();
+        } catch (SQLException ex) {
+            Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -256,37 +262,7 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
     private void jBBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBBuscarActionPerformed
         
         try {
-            Optional<String> apellidos = Optional.ofNullable(jTApellidos.getText()).filter(s -> !s.isEmpty());
-            Optional<String> nombres = Optional.ofNullable(jTNombres.getText()).filter(s -> !s.isEmpty());
-            Boolean esDonante = null;
-            
-            if(!jCBDonante.getSelectedItem().equals(" ")) {
-                esDonante = jCBDonante.getSelectedItem().equals("Sí");
-            }
-
-            Criterios criterios = new Criterios(
-                    apellidos,
-                    nombres,
-                    Optional.ofNullable(grupoSanguineoSeleccionado),
-                    Optional.ofNullable(factorSanguineoSeleccionado),
-                    Optional.ofNullable(esDonante)
-            );
-            
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            
-            carnetsVigentes = DAOCarnet.vigentesPorCriterios(criterios);
-            
-            //Borramos todas las filas
-            DefaultTableModel model = (DefaultTableModel) JTCriterios.getModel();
-            int rowCount = model.getRowCount();
-            for (int i = rowCount - 1; i >= 0; i--) {
-                model.removeRow(i);
-            }
-            
-            //llenamos el modelo con la lista
-            carnetsVigentes.forEach((c) -> {
-                model.addRow(new Object[]{c.getNumero().get(), c.getExpiracion().format(formatter)});
-            });
+            completarTabla();
         } catch (SQLException ex) {
             Logger.getLogger(VentanaVigentesPorCriterios.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -352,6 +328,41 @@ public class VentanaVigentesPorCriterios extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jCBDonanteActionPerformed
 
+    private void completarTabla() throws SQLException {
+        Optional<String> apellidos = Optional.ofNullable(jTApellidos.getText()).filter(s -> !s.isEmpty());
+        Optional<String> nombres = Optional.ofNullable(jTNombres.getText()).filter(s -> !s.isEmpty());
+        Boolean esDonante = null;
+
+        if (!jCBDonante.getSelectedItem().equals(" ")) {
+            esDonante = jCBDonante.getSelectedItem().equals("Sí");
+        }
+
+        Criterios criterios = new Criterios(
+                apellidos,
+                nombres,
+                Optional.ofNullable(grupoSanguineoSeleccionado),
+                Optional.ofNullable(factorSanguineoSeleccionado),
+                Optional.ofNullable(esDonante)
+        );
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        carnetsVigentes = DAOCarnet.vigentesPorCriterios(criterios);
+
+        //Borramos todas las filas
+        DefaultTableModel model = (DefaultTableModel) JTCriterios.getModel();
+        int rowCount = model.getRowCount();
+        for (int i = rowCount - 1; i >= 0; i--) {
+            model.removeRow(i);
+        }
+
+        //llenamos el modelo con la lista
+        carnetsVigentes.forEach((c) -> {
+            model.addRow(new Object[]{c.getNumero().get(), c.getExpiracion().format(formatter)});
+        });
+    }
+    
+    
     /**
      * @param args the command line arguments
      */

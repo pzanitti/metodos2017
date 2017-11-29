@@ -141,7 +141,7 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
             }
         });
 
-        altaBtn.setText("Dar de alta");
+        altaBtn.setText("Dar de alta...");
         altaBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 titularBtnActionPerformed(evt);
@@ -202,7 +202,7 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel11)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel17)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -241,7 +241,8 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
                     .addComponent(jLabel9)
                     .addComponent(esDonanteCheckbox))
                 .addGap(5, 5, 5)
-                .addComponent(altaBtn))
+                .addComponent(altaBtn)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -283,7 +284,7 @@ public class VentanaAltaTitular extends javax.swing.JDialog {
                 {
                     JOptionPane.showOptionDialog(
                             ventanaPrincipal,
-                            "Se a creado correctamente el titular.", 
+                            "Se ha creado correctamente el titular.", 
                             "",
                             JOptionPane.YES_NO_CANCEL_OPTION,
                             JOptionPane.INFORMATION_MESSAGE,
