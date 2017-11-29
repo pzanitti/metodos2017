@@ -29,7 +29,9 @@ public class pdf {
     public static final String CARNET_HTML = "src/carnets/carnetPDF.template.html";
     public static final String COSTO_CARNET_HTML = "src/carnets/costoCarnetPDF.template.html";
 
-    public void emitirLicencia(Carnet carnet, Titular titular) throws IOException, DocumentException {
+    public void emitirLicencia(Carnet carnet) throws IOException, DocumentException {
+        Titular titular = carnet.getTitular();
+        
         String file = System.getProperty("user.home") + "/Desktop/" + carnet.getNumero().get() + ".pdf";
         
         File fileHandle = new File(file);
@@ -70,7 +72,9 @@ public class pdf {
     }
     
     
-    public void imprimirComprobante(Carnet carnet, Titular titular, int costo) throws FileNotFoundException, IOException, DocumentException {
+    public void imprimirComprobante(Carnet carnet, int costo) throws FileNotFoundException, IOException, DocumentException {
+        Titular titular = carnet.getTitular();
+        
         String file = System.getProperty("user.home") + "/Desktop/Costo " + carnet.getNumero().get() + ".pdf";
         System.out.println("imprimirComprobante" + file);
         File fileHandle = new File(file);

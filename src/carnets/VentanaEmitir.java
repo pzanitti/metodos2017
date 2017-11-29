@@ -401,8 +401,8 @@ public class VentanaEmitir extends javax.swing.JDialog {
                 unCarnet = DAOCarnet.insertar(unCarnet);
                 
                 pdf unPdf = new pdf();
-                unPdf.emitirLicencia(unCarnet, titularEncontrado.get());
-                unPdf.imprimirComprobante(unCarnet, titularEncontrado.get(), costo.get());
+                unPdf.emitirLicencia(unCarnet);
+                unPdf.imprimirComprobante(unCarnet, costo.get());
                 
                 dispose();
             }
